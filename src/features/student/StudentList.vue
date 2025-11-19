@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-x-auto">
-    <table class="table">
+    <table class="table table-md">
       <!-- head -->
       <thead>
         <tr>
