@@ -1,38 +1,32 @@
-# .
+# Student Management System
+This is a simple student management system built with Vue 3 and Vite.
+The source code is from BiliBili UP: [HDAlex_John](https://space.bilibili.com/337242418?spm_id_from=333.788.upinfo.head.click)
 
-This template should help get you started developing with Vue 3 in Vite.
+# Installation 
+1. Clone the repository
+   ```bash
+   git clone https://github.com/JINLING1/StudentManagement.git
+   ```
+2. Install dependencies
+   ```bash
+   pnpm install
+   ```
+3. Run the development server
+   ```bash
+   pnpm run dev
+   ```
+4. Open your browser and navigate to `http://localhost:5173`
 
-## Recommended IDE Setup
+# Features
+- More details to follow.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+# Technologies Used
+- Vue 3
+- Vite
+- Pinia for state management
+- Vue Router for routing
+- DaisyUI for UI components
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-pnpm dev
-```
-
-### Compile and Minify for Production
-
-```sh
-pnpm build
-```
+# License
+This project is licensed under the MIT License.
+See the [LICENSE](LICENSE) file for details.
