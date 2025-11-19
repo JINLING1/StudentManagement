@@ -21,9 +21,15 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
+    "cz-conventional-changelog": "^3.3.0",
     "daisyui": "^5.5.5",
     "prettier": "3.6.2",
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

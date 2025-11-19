@@ -1,6 +1,7 @@
 <template>
   <div class="navbar bg-base-300 shadow-sm">
     <div class="navbar-start">
+      <!-- dropdown menu for mobile  -->
       <div class="dropdown">
         <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -8,18 +9,21 @@
           </svg>
         </div>
         <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-          <li><a>Score</a></li>
-          <li><a>Student</a></li>
+          <li><a @click="router.push('/score')" :class="route.path === '/score' ? 'menu-active' : ''">Score</a></li>
+          <li><a @click="router.push('/student')" :class="route.path === '/student' ? 'menu-active' : ''">Student</a>
+          </li>
         </ul>
       </div>
-      <a class="btn btn-ghost text-xl">Sunshine</a>
+      <a @click="router.push('/')" class="btn btn-ghost text-xl">Sunshine</a>
     </div>
+    <!-- navigation menu for desktop -->
     <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
-        <li><a>Score</a></li>
-        <li><a>Student</a></li>
+        <li><a @click="router.push('/score')" :class="route.path === '/score' ? 'menu-active' : ''">Score</a></li>
+        <li><a @click="router.push('/student')" :class="route.path === '/student' ? 'menu-active' : ''">Student</a></li>
       </ul>
     </div>
+    <!-- avatar -->
     <div class="navbar-end">
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
@@ -43,5 +47,10 @@
 </template>
 
 <script setup>
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
 
 </script>
