@@ -5,19 +5,26 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/home/score',
+    },
+    {
+      path: '/home',
       name: 'home',
-      redirect: '/score',
+      component: () => import('@/views/HomeView.vue'),
+      children: [
+        {
+          path: 'score',
+          name: 'score',
+          component: () => import('@/features/score/ScoreList.vue'),
+        },
+        {
+          path: 'student',
+          name: 'student',
+          component: () => import('@/features/student/StudentList.vue'),
+        },
+      ],
     },
-    {
-      path: '/score',
-      name: 'score',
-      component: () => import('@/features/score/ScoreList.vue'),
-    },
-    {
-      path: '/student',
-      name: 'student',
-      component: () => import('@/features/student/StudentList.vue'),
-    },
+
     {
       path: '/login',
       name: 'login',

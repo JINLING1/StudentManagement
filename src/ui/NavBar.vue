@@ -9,8 +9,10 @@
           </svg>
         </div>
         <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-          <li><a @click="router.push('/score')" :class="route.path === '/score' ? 'menu-active' : ''">Score</a></li>
-          <li><a @click="router.push('/student')" :class="route.path === '/student' ? 'menu-active' : ''">Student</a>
+          <li><a @click="router.push({ name: 'score' })" :class="route.name === 'score' ? 'menu-active' : ''">Score</a>
+          </li>
+          <li><a @click="router.push({ name: 'student' })"
+              :class="route.name === 'student' ? 'menu-active' : ''">Student</a>
           </li>
         </ul>
       </div>
@@ -19,8 +21,11 @@
     <!-- navigation menu for desktop -->
     <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
-        <li><a @click="router.push('/score')" :class="route.path === '/score' ? 'menu-active' : ''">Score</a></li>
-        <li><a @click="router.push('/student')" :class="route.path === '/student' ? 'menu-active' : ''">Student</a></li>
+        <li><a @click="router.push({ name: 'score' })" :class="route.name === 'score' ? 'menu-active' : ''">Score</a>
+        </li>
+        <li><a @click="router.push({ name: 'student' })"
+            :class="route.name === 'student' ? 'menu-active' : ''">Student</a>
+        </li>
       </ul>
     </div>
     <!-- avatar -->
