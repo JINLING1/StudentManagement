@@ -1,0 +1,50 @@
+<template>
+  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 mx-auto my-20">
+    <div class="avatar flex justify-center ">
+      <div class="w-24 rounded-full cursor-pointer">
+        <label for="avatar-img">
+          <img :src="currentAvatarUrl" />
+        </label>
+      </div>
+    </div>
+
+    <input class="hidden" type="file" accept="image/*" id="avatar-img" @change="handleAvatarChange" />
+    <div class="w-3/4 mx-auto">
+      <label class="input">
+        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </g>
+        </svg>
+        <input type="text" value="JinLing" class="grow" disabled />
+      </label>
+      <ul class="menu bg-base-200 rounded-box w-56">
+        <li>
+          <details open>
+            <summary>Class in Charge</summary>
+            <ul>
+              <li><a>Class 1 | Year 9</a></li>
+              <li><a>Class 2 | Year 9</a></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </div>
+    <button class="btn btn-neutral mt-4">Update Avatar</button>
+
+
+  </fieldset>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const currentAvatarUrl = ref('https://img.daisyui.com/images/profile/demo/yellingcat@192.webp');
+
+function handleAvatarChange(event) {
+  const file = event.target.files[0];
+  const newAvatarUrl = URL.createObjectURL(file);
+  currentAvatarUrl.value = newAvatarUrl;
+}
+</script>

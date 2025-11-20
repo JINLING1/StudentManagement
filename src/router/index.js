@@ -22,6 +22,11 @@ const router = createRouter({
           name: 'student',
           component: () => import('@/features/student/StudentList.vue'),
         },
+        {
+          path: 'info',
+          name: 'info',
+          component: () => import('@/features/user/Info.vue'),
+        },
       ],
     },
 
