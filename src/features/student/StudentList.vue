@@ -15,12 +15,19 @@
         </tr>
       </thead>
       <tbody>
-        <StudentListItem />
+        <StudentListItem v-for="student in studentList" :key="student.id" :student />
       </tbody>
     </table>
   </div>
 </template>
 
 <script setup>
-import StudentListItem from './StudentListItem.vue'
+import { onMounted, ref } from 'vue';
+import StudentListItem from './StudentListItem.vue';
+import { getStudentList } from '@/services/apiStudent';
+
+const studentList = ref([]);
+onMounted(() => {
+  studentList.value = getStudentList();
+});
 </script>

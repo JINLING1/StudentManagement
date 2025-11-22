@@ -11,22 +11,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Cy Ganderton</td>
-          <td>Class 1 | Year 9</td>
-          <td>Math</td>
-          <td>2025 Spring</td>
-          <td>86</td>
-          <td>
-            <button class="btn btn-ghost btn-sm">details</button>
-            <button class="btn btn-error btn-sm">delete</button>
-          </td>
-        </tr>
+        <ScoreListItem v-for="scoreItem in scoreList" :key="scoreItem.id" :score-item />
       </tbody>
     </table>
   </div>
 </template>
 
 <script setup>
+import { getScoreList } from '@/services/apiScore';
+import { onMounted, ref } from 'vue';
+import ScoreListItem from './ScoreListItem.vue';
 
+const scoreList = ref([]);
+onMounted(() => {
+  scoreList.value = getScoreList();
+});
 </script>

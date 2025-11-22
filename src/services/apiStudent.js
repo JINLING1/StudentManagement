@@ -1,0 +1,150 @@
+import { faker } from '@faker-js/faker'
+const mockStudentList = [
+  {
+    id: '1',
+    name: 'Ray Ganderton',
+    gender: 'Male',
+    class: 'Class 1 | Year 9',
+    teacher: 'Mrs. Coleman',
+  },
+  {
+    id: '2',
+    name: 'Liam Patterson',
+    gender: 'Male',
+    class: 'Class 2 | Year 8',
+    teacher: 'Mr. Andrews',
+  },
+  {
+    id: '3',
+    name: 'Emma Collins',
+    gender: 'Female',
+    class: 'Class 3 | Year 9',
+    teacher: 'Ms. Carter',
+  },
+  {
+    id: '4',
+    name: 'Noah Whitfield',
+    gender: 'Male',
+    class: 'Class 1 | Year 10',
+    teacher: 'Mr. Robinson',
+  },
+  {
+    id: '5',
+    name: 'Olivia Sanderson',
+    gender: 'Female',
+    class: 'Class 2 | Year 9',
+    teacher: 'Mrs. Wallace',
+  },
+  {
+    id: '6',
+    name: 'Ethan McKinley',
+    gender: 'Male',
+    class: 'Class 3 | Year 8',
+    teacher: 'Mr. Harrison',
+  },
+  {
+    id: '7',
+    name: 'Ava Thornton',
+    gender: 'Female',
+    class: 'Class 1 | Year 9',
+    teacher: 'Ms. Dalton',
+  },
+  {
+    id: '8',
+    name: 'Mason Harwood',
+    gender: 'Male',
+    class: 'Class 2 | Year 10',
+    teacher: 'Mr. Bennett',
+  },
+  {
+    id: '9',
+    name: 'Sophia Rainsford',
+    gender: 'Female',
+    class: 'Class 3 | Year 9',
+    teacher: 'Mrs. Caldwell',
+  },
+  {
+    id: '10',
+    name: 'Logan Fairchild',
+    gender: 'Male',
+    class: 'Class 1 | Year 8',
+    teacher: 'Mr. Turner',
+  },
+  {
+    id: '11',
+    name: 'Isabella Carleton',
+    gender: 'Female',
+    class: 'Class 2 | Year 9',
+    teacher: 'Ms. Hamilton',
+  },
+  {
+    id: '12',
+    name: 'James Ellington',
+    gender: 'Male',
+    class: 'Class 3 | Year 10',
+    teacher: 'Mr. Sullivan',
+  },
+  {
+    id: '13',
+    name: 'Mia Alderidge',
+    gender: 'Female',
+    class: 'Class 1 | Year 9',
+    teacher: 'Mrs. Blake',
+  },
+  {
+    id: '14',
+    name: 'Benjamin Hargrave',
+    gender: 'Male',
+    class: 'Class 2 | Year 8',
+    teacher: 'Mr. Pearson',
+  },
+  {
+    id: '15',
+    name: 'Charlotte Winslow',
+    gender: 'Female',
+    class: 'Class 3 | Year 9',
+    teacher: 'Ms. Fleming',
+  },
+  {
+    id: '16',
+    name: 'Henry Ashford',
+    gender: 'Male',
+    class: 'Class 1 | Year 10',
+    teacher: 'Mr. Clarkson',
+  },
+  {
+    id: '17',
+    name: 'Amelia Thornton',
+    gender: 'Female',
+    class: 'Class 2 | Year 9',
+    teacher: 'Mrs. Mitchell',
+  },
+  {
+    id: '18',
+    name: 'Alexander Brookstone',
+    gender: 'Male',
+    class: 'Class 3 | Year 8',
+    teacher: 'Mr. Davidson',
+  },
+  {
+    id: '19',
+    name: 'Harper Middleton',
+    gender: 'Female',
+    class: 'Class 1 | Year 9',
+    teacher: 'Ms. Stevenson',
+  },
+  {
+    id: '20',
+    name: 'Daniel Kingsford',
+    gender: 'Male',
+    class: 'Class 2 | Year 10',
+    teacher: 'Mr. Thornton',
+  },
+]
+
+export function getStudentList() {
+  return mockStudentList.map((student) => {
+    const fakeAvatar = faker.image.avatar()
+    return { ...student, avatar: fakeAvatar }
+  })
+}
