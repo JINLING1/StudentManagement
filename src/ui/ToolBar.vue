@@ -22,7 +22,7 @@
       </label>
     </div>
     <div class="col-span-1 text-center">
-      <button class="btn btn-outline btn-primary  btn-md">
+      <button class="btn btn-outline btn-primary  btn-md" @click="onClick">
         {{ route.name === 'score' ? 'Upload Score' : 'Add Student' }}
       </button>
     </div>
@@ -30,8 +30,16 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
 
+function onClick() {
+  if (route.name === 'score') {
+    router.push({ name: 'score-upload' });
+  } else {
+    router.push({ name: 'student-add' });
+  }
+}
 </script>

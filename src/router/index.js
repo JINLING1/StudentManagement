@@ -25,6 +25,11 @@ const router = createRouter({
               name: 'score-edit',
               component: () => import('@/features/score/ScoreEdit.vue'),
             },
+            {
+              path: 'upload',
+              name: 'score-upload',
+              component: () => import('@/features/score/ScoreUpload.vue'),
+            },
           ],
         },
         {
@@ -40,6 +45,11 @@ const router = createRouter({
               name: 'student-edit',
               component: () => import('@/features/student/StudentEdit.vue'),
             },
+            {
+              path: 'add',
+              name: 'student-add',
+              component: () => import('@/features/student/StudentAdd.vue'),
+            },
           ],
         },
         {
@@ -49,7 +59,6 @@ const router = createRouter({
         },
       ],
     },
-
     {
       path: '/login',
       name: 'login',
