@@ -14,8 +14,18 @@ const router = createRouter({
       children: [
         {
           path: 'score',
-          name: 'score',
-          component: () => import('@/features/score/ScoreList.vue'),
+          children: [
+            {
+              path: '',
+              name: 'score',
+              component: () => import('@/features/score/ScoreList.vue'),
+            },
+            {
+              path: ':id', //路由参数
+              name: 'score-edit',
+              component: () => import('@/features/score/ScoreEdit.vue'),
+            },
+          ],
         },
         {
           path: 'student',
