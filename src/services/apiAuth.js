@@ -6,6 +6,7 @@ export async function signup(email, password) {
   })
   if (error) {
     console.log(error.message)
+    return
   }
   return data
 }
@@ -18,6 +19,7 @@ export async function login(email, password) {
 
   if (error) {
     console.log(error.message)
+    return
   }
   return data
 }
