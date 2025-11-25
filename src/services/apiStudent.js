@@ -1,4 +1,4 @@
-import { supabase } from '@/utils/supabase.js'
+import { supabase } from '../utils/supabase.js'
 
 export async function getStudentList() {
   const { data: student, error } = await supabase.from('student').select('*')

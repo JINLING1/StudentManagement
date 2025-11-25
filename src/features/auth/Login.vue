@@ -3,12 +3,12 @@
     <legend class="fieldset-legend mx-auto text-3xl">SunShiune</legend>
 
     <label class="label">Email</label>
-    <input type="email" class="input" placeholder="Email" />
+    <input type="email" class="input" placeholder="Email" v-model="email" />
 
     <label class="label">Password</label>
-    <input type="password" class="input" placeholder="Password" />
+    <input type="password" class="input" placeholder="Password" v-model="password" />
 
-    <button class="btn btn-neutral mt-4">Login</button>
+    <button class="btn btn-neutral mt-4" @click="onClick">Login</button>
 
     <div class="grid grid-cols-2 gap-1">
       <label class="label">
@@ -24,5 +24,18 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { login } from '@/services/apiAuth.js';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const email = ref('');
+const password = ref('');
 
+async function onClick() {
+  const data = await login(email.value, password.value);
+  if (data) {
+    router.push('/');
+  }
+
+}
 </script>

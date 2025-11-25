@@ -43,7 +43,7 @@
               Profile
             </a>
           </li>
-          <li><a>Logout</a></li>
+          <li><a @click="onClick">Logout</a></li>
         </ul>
       </div>
 
@@ -53,9 +53,13 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
+import { signout } from '@/services/apiAuth.js';
 
 const route = useRoute();
 const router = useRouter();
 
-
+async function onClick() {
+  await signout();
+  router.push({ name: 'login' });
+}
 </script>

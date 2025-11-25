@@ -3,19 +3,29 @@
     <legend class="fieldset-legend mx-auto text-3xl">SunShiune</legend>
 
     <label class="label">Email</label>
-    <input type="email" class="input" placeholder="Email" />
+    <input type="email" class="input" placeholder="Email" v-model="email" />
 
     <label class="label">Password</label>
-    <input type="password" class="input" placeholder="Password" />
+    <input type="password" class="input" placeholder="Password" v-model="password" />
 
     <label class="label">Confirm Password</label>
-    <input type="password" class="input" placeholder="Confirm Password" />
+    <input type="password" class="input" placeholder="Confirm Password" v-model="confirmPassword" />
 
-    <button class="btn btn-neutral mt-4">Sign Up</button>
+    <button class="btn btn-neutral mt-4" @click="onClick">Sign Up</button>
     <button class="btn btn-ghost mt-4">Login</button>
   </fieldset>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { signup } from '@/services/apiAuth';
 
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+
+async function onClick() {
+  const data = await signup(email.value, password.value);
+  console.log(data);
+}
 </script>
