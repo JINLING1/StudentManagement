@@ -23,7 +23,10 @@ import { onMounted, ref } from 'vue';
 import ScoreListItem from './ScoreListItem.vue';
 
 const scoreList = ref([]);
-onMounted(() => {
-  scoreList.value = getScoreList();
+onMounted(async () => {
+  scoreList.value = await getScoreList();
+  console.log(scoreList.value)
 });
+
+
 </script>

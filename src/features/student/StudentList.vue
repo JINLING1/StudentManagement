@@ -27,7 +27,7 @@ import StudentListItem from './StudentListItem.vue';
 import { getStudentList } from '@/services/apiStudent';
 
 const studentList = ref([]);
-onMounted(() => {
-  studentList.value = getStudentList();
+onMounted(async () => {
+  studentList.value = await getStudentList();
 });
 </script>

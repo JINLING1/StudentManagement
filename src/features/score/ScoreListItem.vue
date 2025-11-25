@@ -1,9 +1,9 @@
 <template>
   <tr>
-    <td>{{ scoreItem.name }}</td>
+    <td>{{ scoreItem.student_id }}</td>
     <td>{{ scoreItem.class }}</td>
     <td>{{ scoreItem.subject }}</td>
-    <td>{{ scoreItem.semester }}</td>
+    <td>{{ scoreItem.semesterSeason }} {{ scoreItem.semesterYear }}</td>
     <td>{{ scoreItem.score }}</td>
     <td>
       <button class="btn btn-ghost btn-sm"

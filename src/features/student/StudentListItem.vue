@@ -21,9 +21,7 @@
     </td>
     <!-- class and teacher -->
     <td>
-      {{ student.class }}
-      <br />
-      <span class="badge badge-ghost badge-sm">{{ student.teacher }}</span>
+      class{{ student.class }}|grade{{ student.grade }}
     </td>
     <th>
       <button class="btn btn-ghost btn-sm"
