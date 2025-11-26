@@ -31,20 +31,33 @@
         </li>
       </ul>
     </div>
-    <button class="btn btn-neutral mt-4">Update Avatar</button>
+    <button class="btn btn-neutral mt-4" @click="onClick">Update Avatar</button>
 
 
   </fieldset>
 </template>
 
 <script setup>
+import { uploadAvatar } from '@/services/apiStorage';
 import { ref } from 'vue';
 
 const currentAvatarUrl = ref('https://img.daisyui.com/images/profile/demo/yellingcat@192.webp');
+const avatarFile = ref(null)
 
 function handleAvatarChange(event) {
   const file = event.target.files[0];
+  console.log(file);
+  avatarFile.value = file;
+
   const newAvatarUrl = URL.createObjectURL(file);
   currentAvatarUrl.value = newAvatarUrl;
+}
+
+async function onClick() {
+  if (!avatarFile.value) {
+    return;
+  }
+  const data = await uploadAvatar(avatarFile.value);
+  return data;
 }
 </script>
