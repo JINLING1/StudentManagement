@@ -1,3 +1,4 @@
+import { isAuthenticated } from '@/hooks/useAuth'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -70,6 +71,26 @@ const router = createRouter({
       component: () => import('@/features/auth/Signup.vue'),
     },
   ],
+})
+
+router.beforeEach(async (to) => {
+  //   if (
+  //     // make sure the user is authenticated
+  //     !isAuthenticated &&
+  //     // ❗️ Avoid an infinite redirect
+  //     to.name !== 'Login'
+  //   ) {
+  //     // redirect the user to the login page
+  //     return { name: 'Login' }
+  //   }
+  const routeName = to.name
+  if (routeName !== 'login' && routeName !== 'signup') {
+    const isLogin = await isAuthenticated()
+    if (!isLogin) {
+      router.push({ name: 'login' })
+      return
+    }
+  }
 })
 
 export default router
