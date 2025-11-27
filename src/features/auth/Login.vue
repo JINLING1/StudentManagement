@@ -18,7 +18,7 @@
       <button class="btn btn-link text-xs">Forget Password?</button>
     </div>
 
-    <button class="btn   mt-4">Sign Up</button>
+    <button class="btn   mt-4" @click="router.push({ name: 'signup' })">Sign Up</button>
 
   </fieldset>
 </template>

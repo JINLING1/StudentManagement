@@ -39,9 +39,14 @@
 
 <script setup>
 import { uploadAvatar } from '@/services/apiStorage';
-import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { ref, onMounted } from 'vue';
+import { useUserStore } from '@/stores/user.js';
 
-const currentAvatarUrl = ref('https://img.daisyui.com/images/profile/demo/yellingcat@192.webp');
+const userStore = useUserStore();
+const { updateUser } = userStore;
+const { user } = storeToRefs(userStore);
+const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
 
 function handleAvatarChange(event) {
@@ -58,6 +63,12 @@ async function onClick() {
     return;
   }
   const data = await uploadAvatar(avatarFile.value);
-  return data;
+  // 更新store中的avatar
+  updateUser(data.user.user_metadata);
+  console.log('finish')
 }
+
+onMounted(() => {
+  currentAvatarUrl.value = user.value.avatar;
+})
 </script>

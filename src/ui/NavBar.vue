@@ -33,8 +33,7 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
-            <img alt="Tailwind CSS Navbar component"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+            <img alt="Tailwind CSS Navbar component" :src="user.avatar" />
           </div>
         </div>
         <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
@@ -52,14 +51,33 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+
 import { signout } from '@/services/apiAuth.js';
+import { useUserStore } from '@/stores/user';
+import { getConfig } from '@/utils/configHelper';
+
 
 const route = useRoute();
 const router = useRouter();
+
+const userStore = useUserStore();
+
+const { updateUser } = userStore;
+const { user } = storeToRefs(userStore);
 
 async function onClick() {
   await signout();
   router.push({ name: 'login' });
 }
+
+// 所有界面（除了登录页）都有此组件，因此在 NavBar mounted 时更新用户头像
+onMounted(() => {
+  const token = getConfig('SUPABASE_TOKEN');
+  const userToken = JSON.parse(localStorage.getItem(token));
+  const userMetadata = userToken?.user?.user_metadata;
+  updateUser(userMetadata);
+})
 </script>
