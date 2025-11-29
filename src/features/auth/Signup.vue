@@ -18,8 +18,9 @@
 
 <script setup>
 import { ref } from 'vue';
-import { signup } from '@/services/apiAuth';
 import { useRouter } from 'vue-router';
+import { signup } from '@/services/apiAuth.js';
+import { createTeacher } from '@/services/apiTeacher.js'
 
 const router = useRouter();
 const email = ref('');
@@ -29,5 +30,8 @@ const confirmPassword = ref('');
 async function onClick() {
   const data = await signup(email.value, password.value);
   console.log(data);
+
+  const teacherId = data.user.id;
+  await createTeacher({ teacher_id: teacherId });
 }
 </script>

@@ -19,13 +19,16 @@
         </svg>
         <input type="text" value="JinLing" class="grow" disabled />
       </label>
-      <ul class="menu bg-base-200 rounded-box w-56">
+      <ul class="menu bg-base-200 rounded-box w-56" v-if="classInChargeArr.length > 0">
         <li>
           <details open>
             <summary>Class in Charge</summary>
             <ul>
-              <li><a>Class 1 | Year 9</a></li>
-              <li><a>Class 2 | Year 9</a></li>
+              <li v-for="(classItem, index) in classInChargeArr" :key="index">
+                <a>
+                  Class {{ classItem.split("|")[0] }} | Year {{ classItem.split("|")[1] }}
+                </a>
+              </li>
             </ul>
           </details>
         </li>
@@ -42,6 +45,7 @@ import { uploadAvatar } from '@/services/apiStorage';
 import { storeToRefs } from 'pinia';
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user.js';
+import { getTeacherByTeacherId } from '@/services/apiTeacher';
 
 const userStore = useUserStore();
 const { updateUser } = userStore;
@@ -68,7 +72,11 @@ async function onClick() {
   console.log('finish')
 }
 
-onMounted(() => {
+const classInChargeArr = ref([]);
+
+onMounted(async () => {
   currentAvatarUrl.value = user.value.avatar;
+  const teachers = await getTeacherByTeacherId(user.value.sub);
+  classInChargeArr.value = JSON.parse(teachers[0].class_in_charge);
 })
 </script>
