@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase.js'
-export async function signup(email, password) {
+export async function signup(email, password, metadata = {}) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -7,6 +7,7 @@ export async function signup(email, password) {
       data: {
         display_name: `User-${Date.now()}`,
         avatar: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
+        ...metadata,
       },
     },
   })
