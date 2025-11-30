@@ -17,8 +17,8 @@
 
     <select class="select mx-auto my-2" v-model="gender">
       <option disabled selected>Choose Gender</option>
-      <option>Female</option>
-      <option>Male</option>
+      <option>female</option>
+      <option>male</option>
     </select>
     <button class="btn btn-neutral mt-4" @click="onClick">Add Student</button>
 
@@ -37,7 +37,7 @@ import { signup } from '@/services/apiAuth.js';
 
 const email = ref('someone@example.com');
 const name = ref('JinLing');
-const gender = ref('Female');
+const gender = ref('female');
 const classInfo = ref('Class X| Year X');
 const classInChargeArr = ref([]);
 const teacherId = ref('');
