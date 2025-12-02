@@ -11,7 +11,8 @@
         </tr>
       </thead>
       <tbody>
-        <ScoreListItem v-for="scoreItem in scoreList" :key="scoreItem.id" :score-item />
+        <ScoreListItem v-for="scoreItem in filteredScoreList" :key="scoreItem.id" :scoreItem
+          :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)" />
       </tbody>
     </table>
   </div>
@@ -19,13 +20,27 @@
 
 <script setup>
 import { getScoreList } from '@/services/apiScore';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import ScoreListItem from './ScoreListItem.vue';
+import { getStudentList } from '@/services/apiStudent';
+import { getConfig } from '@/utils/configHelper';
+
 
 const scoreList = ref([]);
+const students = ref([]);
+const filteredScoreList = computed(() => {
+  return scoreList.value.filter((scoreItem) =>
+    students.value.map((student) => student.student_id).includes(scoreItem.student_id)
+  );
+})
+
 onMounted(async () => {
   scoreList.value = await getScoreList();
-  console.log(scoreList.value)
+
+  const token = getConfig('SUPABASE_TOKEN');
+  const userToken = JSON.parse(localStorage.getItem(token));
+  const teacherId = userToken.user.id;
+  students.value = await getStudentList(teacherId);
 });
 
 

@@ -1,7 +1,7 @@
 <template>
   <tr>
-    <td>{{ scoreItem.student_id }}</td>
-    <td>{{ scoreItem.class }}</td>
+    <td>{{ currentStudent.name }}</td>
+    <td>{{ `Class ${currentStudent.class} | Year ${currentStudent.grade}` }}</td>
     <td>{{ scoreItem.subject }}</td>
     <td>{{ scoreItem.semesterSeason }} {{ scoreItem.semesterYear }}</td>
     <td>{{ scoreItem.score }}</td>
@@ -16,5 +16,5 @@
 <script setup>
 import { useRouter } from 'vue-router';
 const router = useRouter();
-defineProps(['scoreItem']);
+defineProps(['scoreItem', 'currentStudent']);
 </script>

@@ -25,9 +25,14 @@
 import { onMounted, ref } from 'vue';
 import StudentListItem from './StudentListItem.vue';
 import { getStudentList } from '@/services/apiStudent';
+import { getConfig } from '@/utils/configHelper';
 
 const studentList = ref([]);
 onMounted(async () => {
-  studentList.value = await getStudentList();
+  const token = getConfig('SUPABASE_TOKEN');
+  const userToken = JSON.parse(localStorage.getItem(token));
+
+  const teacherId = userToken.user.id;
+  studentList.value = await getStudentList(teacherId);
 });
 </script>

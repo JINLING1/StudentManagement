@@ -171,3 +171,12 @@ export async function getScoreList() {
   }
   return score
 }
+
+export async function createScore(newScore) {
+  const { data, error } = await supabase.from('score').insert([newScore]).select()
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return data
+}

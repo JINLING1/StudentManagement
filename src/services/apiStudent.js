@@ -1,7 +1,10 @@
 import { supabase } from '../utils/supabase.js'
 
-export async function getStudentList() {
-  const { data: student, error } = await supabase.from('student').select('*')
+export async function getStudentList(teacherId) {
+  const { data: student, error } = await supabase
+    .from('student')
+    .select('*')
+    .eq('teacher_id', teacherId)
 
   if (error) {
     console.log(error.message)
