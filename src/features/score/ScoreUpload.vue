@@ -10,11 +10,11 @@
     </div>
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Class</label>
-      <input type="text" class="grow" v-model="classInfo" />
+      <input type="text" class="grow" v-model="classInfo" disabled />
     </div>
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Score</label>
-      <input type="number" class="grow" v-model="score" min="0" max="100" />
+      <input type="number" class="grow" v-model="score" min="0" max="100" disabled />
     </div>
 
     <select class="select mx-auto my-2" v-model="subject">
