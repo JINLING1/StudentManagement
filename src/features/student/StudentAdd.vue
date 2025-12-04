@@ -28,6 +28,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 
 import { useUserStore } from '@/stores/user.js';
 import { getTeacherByTeacherId } from '@/services/apiTeacher';
@@ -42,6 +43,8 @@ const classInfo = ref('Class X| Year X');
 const classInChargeArr = ref([]);
 const teacherId = ref('');
 
+const router = useRouter();
+
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 
@@ -53,11 +56,13 @@ async function onClick() {
     name: name.value,
     class: classInfo.value.split("|")[0],
     grade: classInfo.value.split("|")[1],
+    gender: gender.value,
     teacher_id: teacherId.value,
     avatar: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
     student_id: studentId,
   });
   console.log(students);
+  router.push({ name: 'student' });
 }
 
 
