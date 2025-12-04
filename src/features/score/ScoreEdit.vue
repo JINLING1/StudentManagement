@@ -1,10 +1,11 @@
 <template>
   <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20">
-    <legend class="fieldset-legend mx-auto text-3xl pt-15">Alex </legend>
+    <legend class="fieldset-legend mx-auto text-3xl pt-15">{{ currentStudent.name }} </legend>
 
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Class</label>
-      <input type="email" class="grow" value="Class 1|Year 9" disabled />
+      <input type="email" class="grow" :value="`Class ${currentStudent.class} | Year ${currentStudent.grade}`"
+        disabled />
     </div>
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Score</label>
@@ -32,13 +33,17 @@
         <option>Fall</option>
       </select>
     </div>
-    <button class="btn btn-neutral mt-4">Update Score</button>
+    <button class="btn btn-neutral mt-4" @click="onClick">Update Score</button>
 
   </fieldset>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { getScoreByScoreId, updateScore } from '@/services/apiScore';
+import { getStudentByStudentId } from '@/services/apiStudent';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const score = ref(0);
 const subject = ref('Math');
@@ -47,4 +52,38 @@ const semesterYear = ref(new Date().getFullYear());
 
 const yearList = Array.from({ length: new Date().getFullYear() - 2000 + 1 }, (_, i) => 2000 + i);
 
+const route = useRoute();
+const router = useRouter()
+  ;
+const currentStudent = ref({
+  name: 'someone',
+  class: 'x',
+  grade: 'x',
+});
+
+async function onClick() {
+  const newScore = {
+    score: score.value,
+    subject: subject.value,
+    semesterSeason: semesterSeason.value,
+    semesterYear: semesterYear.value,
+  };
+  const scores = await updateScore(route.params.id, newScore);
+  console.log(scores);
+
+  router.push({ name: 'score' });
+}
+
+onMounted(async () => {
+  const scores = await getScoreByScoreId(route.params.id);
+  const scoreData = scores[0];
+
+  score.value = scoreData.score;
+  subject.value = scoreData.subject;
+  semesterSeason.value = scoreData.semesterSeason;
+  semesterYear.value = scoreData.semesterYear;
+
+  const student = await getStudentByStudentId(scoreData.student_id);
+  currentStudent.value = student;
+})
 </script>
