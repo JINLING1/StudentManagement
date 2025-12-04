@@ -21,3 +21,30 @@ export async function addStudent(newStudent) {
   }
   return data
 }
+
+export async function getStudentByStudentId(studentId) {
+  const { data: student, error } = await supabase
+    .from('student')
+    .select('*')
+    .eq('student_id', studentId)
+
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return student[0]
+}
+
+export async function updateStudent(studentId, newStudent) {
+  const { data, error } = await supabase
+    .from('student')
+    .update(newStudent)
+    .eq('student_id', studentId)
+    .select()
+
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return data
+}

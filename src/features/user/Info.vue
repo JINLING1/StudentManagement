@@ -46,7 +46,7 @@ import { storeToRefs } from 'pinia';
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user.js';
 import { getTeacherByTeacherId } from '@/services/apiTeacher';
-
+import { updateUser as updateUserApi } from '@/services/apiAuth.js'
 const userStore = useUserStore();
 const { updateUser } = userStore;
 const { user } = storeToRefs(userStore);
@@ -66,9 +66,22 @@ async function onClick() {
   if (!avatarFile.value) {
     return;
   }
-  const data = await uploadAvatar(avatarFile.value);
+
+  const token = getConfig('SUPABASE_TOKEN')
+  const supabaseURL = getConfig('SUPABASE_URL')
+
+  const userToken = JSON.parse(localStorage.getItem(token))
+  const newAvatarFileName = `${userToken.user.email}-${Date.now()}.png`;
+
+  await uploadAvatar(avatarFile.value, newAvatarFileName);
+
+  //更新supabase中的信息
+  const updateUserData = await updateUserApi({
+    avatar: `${supabaseURL}/storage/v1/object/public/Avatar/public/${newAvatarFileName}`,
+  })
+
   // 更新store中的avatar
-  updateUser(data.user.user_metadata);
+  updateUser(updateUserData.user.user_metadata);
   console.log('finish')
 }
 
