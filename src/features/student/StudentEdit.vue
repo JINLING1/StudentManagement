@@ -1,5 +1,7 @@
 <template>
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20">
+  <Loading v-show="isLoading" />
+
+  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20" v-show="!isLoading">
     <div class="avatar flex justify-center ">
       <div class="w-24 rounded-full ">
         <label for="avatar-img" class="cursor-pointer">
@@ -34,11 +36,13 @@ import { updateStudent } from '@/services/apiStudent';
 import { uploadAvatar } from '@/services/apiStorage';
 import { getConfig } from '@/utils/configHelper';
 import { useRouter } from 'vue-router';
+import Loading from '@/ui/Loading.vue';
 
 const route = useRoute();
 const router = useRouter();
 const gender = ref('Female');
 const name = ref('JinLing');
+const isLoading = ref(true);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
 
@@ -78,11 +82,13 @@ async function onClick() {
 
 
 onMounted(async () => {
+  isLoading.value = true;
   const studentId = route.params.id;
   const student = await getStudentByStudentId(studentId);
 
   name.value = student.name;
   gender.value = student.gender;
   currentAvatarUrl.value = student.avatar;
+  isLoading.value = false;
 })
 </script>

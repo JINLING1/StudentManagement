@@ -1,5 +1,7 @@
 <template>
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 mx-auto my-20">
+  <Loading v-show="isLoading" />
+
+  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 mx-auto my-20" v-show="!isLoading">
     <div class="avatar flex justify-center ">
       <div class="w-24 rounded-full cursor-pointer">
         <label for="avatar-img">
@@ -47,11 +49,14 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user.js';
 import { getTeacherByTeacherId } from '@/services/apiTeacher';
 import { updateUser as updateUserApi } from '@/services/apiAuth.js'
+import Loading from '@/ui/Loading.vue';
+
 const userStore = useUserStore();
 const { updateUser } = userStore;
 const { user } = storeToRefs(userStore);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
+const isLoading = ref(true);
 
 function handleAvatarChange(event) {
   const file = event.target.files[0];
@@ -88,8 +93,10 @@ async function onClick() {
 const classInChargeArr = ref([]);
 
 onMounted(async () => {
+  isLoading.value = true;
   currentAvatarUrl.value = user.value.avatar;
   const teachers = await getTeacherByTeacherId(user.value.sub);
   classInChargeArr.value = JSON.parse(teachers[0].class_in_charge);
+  isLoading.value = false;
 })
 </script>

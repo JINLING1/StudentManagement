@@ -1,5 +1,7 @@
 <template>
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20">
+  <Loading v-show="isLoading" />
+
+  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20" v-show="!isLoading">
     <legend class="fieldset-legend mx-auto text-3xl pt-15">{{ currentStudent.name }} </legend>
 
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
@@ -44,6 +46,7 @@ import { getStudentByStudentId } from '@/services/apiStudent';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
+import Loading from '@/ui/Loading.vue';
 
 const score = ref(0);
 const subject = ref('Math');
@@ -55,6 +58,7 @@ const yearList = Array.from({ length: new Date().getFullYear() - 2000 + 1 }, (_,
 const route = useRoute();
 const router = useRouter()
   ;
+const isLoading = ref(true);
 const currentStudent = ref({
   name: 'someone',
   class: 'x',
@@ -75,6 +79,7 @@ async function onClick() {
 }
 
 onMounted(async () => {
+  isLoading.value = true;
   const scores = await getScoreByScoreId(route.params.id);
   const scoreData = scores[0];
 
@@ -85,5 +90,6 @@ onMounted(async () => {
 
   const student = await getStudentByStudentId(scoreData.student_id);
   currentStudent.value = student;
+  isLoading.value = false;
 })
 </script>
