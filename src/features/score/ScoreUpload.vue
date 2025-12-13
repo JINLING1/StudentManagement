@@ -1,5 +1,6 @@
 <template>
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20">
+  <Loading v-show="isLoading" />
+  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20" v-show="!isLoading">
     <select class="select mx-auto my-2" v-model="currentStudent">
       <option disabled selected>Choose Student</option>
       <option v-for="(student, idx) in students" :key="idx" :value="student">{{ student.name }}</option>
@@ -49,6 +50,9 @@ import { createScore } from '@/services/apiScore';
 import { getStudentList } from '@/services/apiStudent';
 import { getConfig } from '@/utils/configHelper';
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import Loading from '@/ui/Loading.vue';
+import { useToast } from 'vue-toastification';
 
 const currentStudent = ref({
   name: 'someone',
@@ -64,7 +68,10 @@ const semesterYear = ref(new Date().getFullYear());
 
 const yearList = Array.from({ length: new Date().getFullYear() - 2000 + 1 }, (_, i) => 2000 + i);
 
+const toast = useToast();
+const router = useRouter();
 async function onClick() {
+  toast.info('Uploading...');
   const newScore = {
     student_id: currentStudent.value.student_id,
     subject: subject.value,
@@ -75,9 +82,14 @@ async function onClick() {
 
   const scores = await createScore(newScore);
   console.log(scores);
+  toast.clear();
+  toast.success('Successfully uploaded!');
+  router.push({ name: 'score' });
 }
 
+const isLoading = ref(true);
 onMounted(async () => {
+  isLoading.value = true;
   const token = getConfig('SUPABASE_TOKEN');
   const userToken = JSON.parse(localStorage.getItem(token));
 
@@ -85,6 +97,7 @@ onMounted(async () => {
   students.value = await getStudentList(teacherId);
 
   currentStudent.value = students.value[0];
+  isLoading.value = false;
 })
 
 </script>

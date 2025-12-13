@@ -37,6 +37,7 @@ import { uploadAvatar } from '@/services/apiStorage';
 import { getConfig } from '@/utils/configHelper';
 import { useRouter } from 'vue-router';
 import Loading from '@/ui/Loading.vue';
+import { useToast } from 'vue-toastification';
 
 const route = useRoute();
 const router = useRouter();
@@ -55,7 +56,9 @@ function handleAvatarChange(event) {
   currentAvatarUrl.value = newAvatarUrl;
 }
 
+const toast = useToast();
 async function onClick() {
+  toast.info('Updating...');
   const newStudent = {
     name: name.value,
     gender: gender.value,
@@ -77,6 +80,8 @@ async function onClick() {
 
   const student = await updateStudent(route.params.id, newStudent);
   console.log(student);
+  toast.clear();
+  toast.success('Successfully updated!');
   router.push({ name: 'student' });
 }
 

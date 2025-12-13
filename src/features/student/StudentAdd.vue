@@ -1,5 +1,6 @@
 <template>
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20">
+  <Loading v-show="isLoading" />
+  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20" v-show="!isLoading">
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Email</label>
       <input type="text" v-model="email" class="grow" />
@@ -29,11 +30,13 @@
 import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
 import { useUserStore } from '@/stores/user.js';
 import { getTeacherByTeacherId } from '@/services/apiTeacher';
 import { addStudent } from '@/services/apiStudent';
 import { signup } from '@/services/apiAuth.js';
+import Loading from '@/ui/Loading.vue';
 
 
 const email = ref('someone@example.com');
@@ -48,8 +51,9 @@ const router = useRouter();
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 
-
+const toast = useToast();
 async function onClick() {
+  toast.info('Adding...');
   const userData = await signup(email.value, '123456', { isStudent: true });
   const studentId = userData.user.id;
   const students = await addStudent({
@@ -62,13 +66,17 @@ async function onClick() {
     student_id: studentId,
   });
   console.log(students);
+  toast.clear();
+  toast.success('Successfully added!');
   router.push({ name: 'student' });
 }
 
-
+const isLoading = ref(true);
 onMounted(async () => {
+  isLoading.value = true;
   teacherId.value = user.value.sub;
   const teachers = await getTeacherByTeacherId(teacherId.value);
   classInChargeArr.value = JSON.parse(teachers[0].class_in_charge);
+  isLoading.value = false;
 })
 </script>

@@ -43,10 +43,12 @@
 <script setup>
 import { getScoreByScoreId, updateScore } from '@/services/apiScore';
 import { getStudentByStudentId } from '@/services/apiStudent';
+import Loading from '@/ui/Loading.vue';
+
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
-import Loading from '@/ui/Loading.vue';
+import { useToast } from 'vue-toastification';
 
 const score = ref(0);
 const subject = ref('Math');
@@ -65,7 +67,11 @@ const currentStudent = ref({
   grade: 'x',
 });
 
+const toast = useToast();
+
 async function onClick() {
+  toast.info('Updating...');
+
   const newScore = {
     score: score.value,
     subject: subject.value,
@@ -74,6 +80,8 @@ async function onClick() {
   };
   const scores = await updateScore(route.params.id, newScore);
   console.log(scores);
+  toast.clear();
+  toast.success('Succssfully updated!');
 
   router.push({ name: 'score' });
 }

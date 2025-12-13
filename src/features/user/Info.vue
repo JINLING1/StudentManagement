@@ -50,6 +50,8 @@ import { useUserStore } from '@/stores/user.js';
 import { getTeacherByTeacherId } from '@/services/apiTeacher';
 import { updateUser as updateUserApi } from '@/services/apiAuth.js'
 import Loading from '@/ui/Loading.vue';
+import { useToast } from 'vue-toastification';
+import { getConfig } from '@/utils/configHelper';
 
 const userStore = useUserStore();
 const { updateUser } = userStore;
@@ -67,11 +69,13 @@ function handleAvatarChange(event) {
   currentAvatarUrl.value = newAvatarUrl;
 }
 
+const toast = useToast();
 async function onClick() {
   if (!avatarFile.value) {
+    toast.warning('Please select an avatar!');
     return;
   }
-
+  toast.info('Updating...');
   const token = getConfig('SUPABASE_TOKEN')
   const supabaseURL = getConfig('SUPABASE_URL')
 
@@ -88,6 +92,8 @@ async function onClick() {
   // 更新store中的avatar
   updateUser(updateUserData.user.user_metadata);
   console.log('finish')
+  toast.clear();
+  toast.success('Successfully updated!');
 }
 
 const classInChargeArr = ref([]);
