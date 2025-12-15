@@ -1,4 +1,4 @@
-import { isAuthenticated } from '@/hooks/useAuth'
+import { isAuthenticated } from '@/utils/authHelper'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
