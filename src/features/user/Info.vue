@@ -52,10 +52,12 @@ import { updateUser as updateUserApi } from '@/services/apiAuth.js'
 import Loading from '@/ui/Loading.vue';
 import { useToast } from 'vue-toastification';
 import { getConfig } from '@/utils/configHelper';
+import { updateStudent } from '@/services/apiStudent';
+import { getUserId } from '@/utils/userHelper';
 
 const userStore = useUserStore();
 const { updateUser } = userStore;
-const { user } = storeToRefs(userStore);
+const { user, isStudent } = storeToRefs(userStore);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
 const isLoading = ref(true);
@@ -84,11 +86,21 @@ async function onClick() {
 
   await uploadAvatar(avatarFile.value, newAvatarFileName);
 
+  const newAvatar = `${supabaseURL}/storage/v1/object/public/Avatar/public/${newAvatarFileName}`;
+
   //更新supabase中的信息
   const updateUserData = await updateUserApi({
-    avatar: `${supabaseURL}/storage/v1/object/public/Avatar/public/${newAvatarFileName}`,
+    avatar: newAvatar,
   })
 
+  //如果是学生，更新学生表中的头像
+  if (isStudent.value) {
+    const userId = getUserId();
+    const students = await updateStudent(userId, {
+      avatar: newAvatar,
+    });
+    console.log(students);
+  }
   // 更新store中的avatar
   updateUser(updateUserData.user.user_metadata);
   console.log('finish')
@@ -101,8 +113,10 @@ const classInChargeArr = ref([]);
 onMounted(async () => {
   isLoading.value = true;
   currentAvatarUrl.value = user.value.avatar;
-  const teachers = await getTeacherByTeacherId(user.value.sub);
-  classInChargeArr.value = JSON.parse(teachers[0].class_in_charge);
+  if (!isStudent.value) {
+    const teachers = await getTeacherByTeacherId(user.value.sub);
+    classInChargeArr.value = JSON.parse(teachers[0].class_in_charge);
+  }
   isLoading.value = false;
 })
 </script>

@@ -14,7 +14,8 @@
       </thead>
       <tbody>
         <ScoreListItem v-for="scoreItem in filteredScoreList" :key="scoreItem.id" :scoreItem
-          :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)" />
+          :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)"
+          v-if="students.length > 0" />
       </tbody>
     </table>
   </div>
@@ -24,27 +25,38 @@
 import { getScoreList } from '@/services/apiScore';
 import { onMounted, ref, computed } from 'vue';
 import ScoreListItem from './ScoreListItem.vue';
-import { getStudentList } from '@/services/apiStudent';
-import { getConfig } from '@/utils/configHelper';
+import { getStudentByStudentId, getStudentList } from '@/services/apiStudent';
+import { getUserId } from '@/utils/userHelper';
 import Loading from '@/ui/Loading.vue';
+import { useUserStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 
+const userStore = useUserStore();
+const { isStudent } = storeToRefs(userStore);
 const scoreList = ref([]);
 const students = ref([]);
 const isLoading = ref(true);
 const filteredScoreList = computed(() => {
-  return scoreList.value.filter((scoreItem) =>
-    students.value.map((student) => student.student_id).includes(scoreItem.student_id)
-  );
+  const userId = getUserId();
+  if (isStudent.value) {
+    return scoreList.value.filter((scoreItem) => scoreItem.student_id === userId);
+  } else {
+    return scoreList.value.filter((scoreItem) => students.value.map((student) => student.student_id).includes(scoreItem.student_id));
+  };
+
 })
 
 onMounted(async () => {
   isLoading.value = true;
   scoreList.value = await getScoreList();
 
-  const token = getConfig('SUPABASE_TOKEN');
-  const userToken = JSON.parse(localStorage.getItem(token));
-  const teacherId = userToken.user.id;
-  students.value = await getStudentList(teacherId);
+  const userId = getUserId();
+  if (!isStudent.value) {
+    students.value = await getStudentList(userId);
+  } else {
+    const student = await getStudentByStudentId(userId);
+    students.value = [student];
+  }
   isLoading.value = false;
 });
 

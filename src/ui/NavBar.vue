@@ -20,7 +20,7 @@
     </div>
     <!-- navigation menu for desktop -->
     <div class="navbar-center hidden lg:flex">
-      <ul class="menu menu-horizontal px-1">
+      <ul class="menu menu-horizontal px-1" v-if="!isStudent">
         <li><a @click="router.push({ name: 'score' })" :class="route.name === 'score' ? 'menu-active' : ''">Score</a>
         </li>
         <li><a @click="router.push({ name: 'student' })"
@@ -66,7 +66,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const { updateUser } = userStore;
-const { user } = storeToRefs(userStore);
+const { user, isStudent } = storeToRefs(userStore);
 
 async function onClick() {
   await signout();
