@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <ScoreListItem v-for="scoreItem in filteredScoreList" :key="scoreItem.id" :scoreItem
+        <ScoreListItem v-for="scoreItem in filteredScoreListBySearch" :key="scoreItem.id" :scoreItem
           :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)"
           v-if="students.length > 0" />
       </tbody>
@@ -29,6 +29,7 @@ import { getStudentByStudentId, getStudentList } from '@/services/apiStudent';
 import { getUserId } from '@/utils/userHelper';
 import Loading from '@/ui/Loading.vue';
 import { useUserStore } from '@/stores/user';
+import { useSearchStore } from '@/stores/search';
 import { storeToRefs } from 'pinia';
 
 const userStore = useUserStore();
@@ -45,6 +46,31 @@ const filteredScoreList = computed(() => {
   };
 
 })
+
+const searchStore = useSearchStore();
+const { scoreSearchCondition } = storeToRefs(searchStore);
+const filteredScoreListBySearch = computed(() => {
+  if (!scoreSearchCondition.value.length) {
+    return filteredScoreList.value;
+  }
+
+  return filteredScoreList.value.filter((scoreItem) => {
+    const scoreInfoJSON = JSON.stringify([
+      scoreItem.subject.toLowerCase(),
+      scoreItem.semesterYear,
+      scoreItem.semesterSeason.toLowerCase(),
+      scoreItem.score,
+    ]);
+
+    for (const condition of scoreSearchCondition.value) {
+      if (!scoreInfoJSON.includes(condition)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+});
 
 onMounted(async () => {
   isLoading.value = true;
