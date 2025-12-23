@@ -30,6 +30,7 @@
     </div>
     <!-- avatar -->
     <div class="navbar-end">
+      <ToggleTheme />
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
@@ -59,6 +60,7 @@ import { signout } from '@/services/apiAuth.js';
 import { useUserStore } from '@/stores/user';
 import { getConfig } from '@/utils/configHelper';
 
+import ToggleTheme from './ToggleTheme.vue';
 
 const route = useRoute();
 const router = useRouter();
