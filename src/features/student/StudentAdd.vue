@@ -1,9 +1,11 @@
 <template>
   <Loading v-show="isLoading" />
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20" v-show="!isLoading">
+  <Form class="fieldset bg-base-200 border-base-300 rounded-box w-sm border p-4 mx-auto my-20" v-show="!isLoading"
+    :validation-schema="validationSchema" @submit="onSubmit">
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Email</label>
-      <input type="text" v-model="email" class="grow" />
+      <Field name="email" type="email" v-model="email" class="grow" />
+      <ErrorMessage name="email" class="text-red-500 text-xs absolute -bottom-5 left-2" />
     </div>
     <div class="input flex items-center justify-center gap-2 mx-auto my-2">
       <label class="label">Name</label>
@@ -21,9 +23,9 @@
       <option>female</option>
       <option>male</option>
     </select>
-    <button class="btn btn-neutral mt-4" @click="onClick">Add Student</button>
+    <button class="btn btn-neutral mt-4">Add Student</button>
 
-  </fieldset>
+  </Form>
 </template>
 
 <script setup>
@@ -31,6 +33,8 @@ import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 
 import { useUserStore } from '@/stores/user.js';
 import { getTeacherByTeacherId } from '@/services/apiTeacher';
@@ -51,8 +55,13 @@ const router = useRouter();
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 
+const validationSchema = yup.object({
+  email: yup.string().required().email(),
+});
+console.log(validationSchema);
+
 const toast = useToast();
-async function onClick() {
+async function onSubmit() {
   toast.info('Adding...');
   const userData = await signup(email.value, '123456', { isStudent: true });
   const studentId = userData.user.id;

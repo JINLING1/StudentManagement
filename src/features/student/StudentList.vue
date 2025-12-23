@@ -29,6 +29,8 @@ import StudentListItem from './StudentListItem.vue';
 import { getStudentList } from '@/services/apiStudent';
 import { getConfig } from '@/utils/configHelper';
 import Loading from '@/ui/Loading.vue';
+import { useSearchStore } from '@/stores/search';
+import { storeToRefs } from 'pinia';
 
 const studentList = ref([]);
 const isLoading = ref(true);
