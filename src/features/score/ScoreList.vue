@@ -13,17 +13,18 @@
         </tr>
       </thead>
       <tbody>
-        <ScoreListItem v-for="scoreItem in filteredScoreListBySearch" :key="scoreItem.id" :scoreItem
+        <ScoreListItem v-for="scoreItem in filteredScoreListByPage" :key="scoreItem.id" :scoreItem
           :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)"
           v-if="students.length > 0" />
       </tbody>
     </table>
   </div>
+  <Pagination :currentPage :pageCount />
 </template>
 
 <script setup>
 import { getScoreList } from '@/services/apiScore';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import ScoreListItem from './ScoreListItem.vue';
 import { getStudentByStudentId, getStudentList } from '@/services/apiStudent';
 import { getUserId } from '@/utils/userHelper';
@@ -31,6 +32,10 @@ import Loading from '@/ui/Loading.vue';
 import { useUserStore } from '@/stores/user';
 import { useSearchStore } from '@/stores/search';
 import { storeToRefs } from 'pinia';
+import Pagination from '@/ui/Pagination.vue';
+import { useRouter } from 'vue-router';
+import { getConfig } from '@/utils/configHelper';
+import { useRoute } from 'vue-router';
 
 const userStore = useUserStore();
 const { isStudent } = storeToRefs(userStore);
@@ -46,6 +51,33 @@ const filteredScoreList = computed(() => {
   };
 
 })
+
+const router = useRouter();
+const route = useRoute();
+const currentPage = ref(route.query.page || 1);
+const pageSize = ref(Number(getConfig('PAGE_SIZE')));
+const pageCount = computed(() =>
+  Math.ceil(filteredScoreListBySearch.value.length / pageSize.value)//向上取整
+);
+
+watch(
+  () => currentPage.value,
+  () => {
+    router.push({ query: { page: currentPage.value } });
+  }
+);
+watch(
+  () => route.query.page,
+  (newPage) => {
+    currentPage.value = newPage;
+  }
+);
+
+const filteredScoreListByPage = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value;
+  const endIndex = currentPage.value * pageSize.value;
+  return filteredScoreListBySearch.value.slice(startIndex, endIndex);
+});
 
 const searchStore = useSearchStore();
 const { scoreSearchCondition } = storeToRefs(searchStore);
@@ -67,12 +99,12 @@ const filteredScoreListBySearch = computed(() => {
         return false;
       }
     }
-
     return true;
   });
 });
 
 onMounted(async () => {
+  router.push({ query: { page: currentPage.value } });
   isLoading.value = true;
   scoreList.value = await getScoreList();
 
