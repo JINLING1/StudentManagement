@@ -73,6 +73,7 @@ watch(
   }
 );
 
+//前端分页
 const filteredScoreListByPage = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize.value;
   const endIndex = currentPage.value * pageSize.value;

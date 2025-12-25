@@ -21,16 +21,22 @@
       </tbody>
     </table>
   </div>
+  <Pagination :currentPage :pageCount />
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import StudentListItem from './StudentListItem.vue';
-import { getStudentList } from '@/services/apiStudent';
+import { getStudentListWithLimit, getStudentListCount } from '@/services/apiStudent';
 import { getConfig } from '@/utils/configHelper';
 import Loading from '@/ui/Loading.vue';
 import { useSearchStore } from '@/stores/search';
 import { storeToRefs } from 'pinia';
+import Pagination from '@/ui/Pagination.vue';
+import { useRouter, useRoute } from 'vue-router';
+import { getUserId } from '@/utils/userHelper';
+
+
 
 const studentList = ref([]);
 const isLoading = ref(true);
@@ -38,6 +44,7 @@ const isLoading = ref(true);
 const searchStore = useSearchStore();
 const { studentSearchCondition } = storeToRefs(searchStore);
 
+//搜索条件过滤学生列表
 const filteredStudentList = computed(() => {
   return studentList.value.filter((student) => {
     const studentInfoJSON = JSON.stringify([student.name.toLowerCase(), student.gender, student.class, student.grade]);
@@ -51,13 +58,46 @@ const filteredStudentList = computed(() => {
   });
 });
 
-onMounted(async () => {
+const router = useRouter();
+const route = useRoute();
+const currentPage = ref(route.query.page || 1);
+const pageSize = ref(Number(getConfig('PAGE_SIZE')));//每页大小
+const pageCount = computed(() => {
+  return Math.ceil(studentCount.value / pageSize.value);
+});
+const studentCount = ref(0);
+
+watch(
+  () => currentPage.value,
+  () => {
+    fetchData();
+    router.push({ query: { page: currentPage.value } });
+  }
+);
+watch(
+  () => route.query.page,
+  (newPage) => {
+    currentPage.value = newPage;
+  }
+);
+
+//后端分页
+async function fetchData() {
   isLoading.value = true;
   const token = getConfig('SUPABASE_TOKEN');
   const userToken = JSON.parse(localStorage.getItem(token));
 
   const teacherId = userToken.user.id;
-  studentList.value = await getStudentList(teacherId);
+  studentList.value = await getStudentListWithLimit(teacherId, currentPage.value, pageSize.value);
   isLoading.value = false;
+}
+
+onMounted(async () => {
+  const userId = getUserId();
+  router.push({ query: { page: currentPage.value } });
+  fetchData();
+  studentCount.value = await getStudentListCount(userId);
 });
+
+
 </script>

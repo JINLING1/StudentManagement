@@ -13,6 +13,32 @@ export async function getStudentList(teacherId) {
   return student
 }
 
+export async function getStudentListCount(teacherId) {
+  const { count, error } = await supabase
+    .from('student')
+    .select('*', { count: 'exact', head: true })
+    .eq('teacher_id', teacherId)
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return count
+}
+
+export async function getStudentListWithLimit(teacherId, currentPage, pageSize) {
+  const { data: student, error } = await supabase
+    .from('student')
+    .select('*')
+    .eq('teacher_id', teacherId)
+    .range((currentPage - 1) * pageSize, currentPage * pageSize - 1)
+
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return student
+}
+
 export async function addStudent(newStudent) {
   const { data, error } = await supabase.from('student').insert([newStudent]).select()
   if (error) {
