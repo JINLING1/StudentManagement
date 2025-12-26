@@ -11,6 +11,9 @@ The source code is from BiliBili UP: [HDAlex_John](https://space.bilibili.com/33
 - Vue Router for routing
 - DaisyUI for UI components
 - Tailwind CSS for styling
+- Vue Toastification for notifications
+- VeeValidate and yup for form validation
+- TanStack Query for remote data fetching
 
 # Installation & Setup
 
