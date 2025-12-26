@@ -8,7 +8,7 @@ export async function getStudentList(teacherId) {
 
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
   return student
 }
@@ -20,7 +20,7 @@ export async function getStudentListCount(teacherId) {
     .eq('teacher_id', teacherId)
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
   return count
 }
@@ -56,7 +56,7 @@ export async function getStudentByStudentId(studentId) {
 
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
   return student[0]
 }

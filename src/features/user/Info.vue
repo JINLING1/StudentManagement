@@ -45,22 +45,22 @@
 <script setup>
 import { uploadAvatar } from '@/services/apiStorage';
 import { storeToRefs } from 'pinia';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from '@/stores/user.js';
-import { getTeacherByTeacherId } from '@/services/apiTeacher';
+import { getTeacherByTeacherId as getTeacherByTeacherIdApi } from '@/services/apiTeacher';
 import { updateUser as updateUserApi } from '@/services/apiAuth.js'
 import Loading from '@/ui/Loading.vue';
 import { useToast } from 'vue-toastification';
 import { getConfig } from '@/utils/configHelper';
 import { updateStudent } from '@/services/apiStudent';
 import { getUserId } from '@/utils/userHelper';
+import { useMutation } from '@tanstack/vue-query';
 
 const userStore = useUserStore();
 const { updateUser } = userStore;
 const { user, isStudent } = storeToRefs(userStore);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
-const isLoading = ref(true);
 
 function handleAvatarChange(event) {
   const file = event.target.files[0];
@@ -110,13 +110,21 @@ async function onClick() {
 
 const classInChargeArr = ref([]);
 
-onMounted(async () => {
-  isLoading.value = true;
+const { mutate: getTeacherByTeacherId, isPending: isTeacherIdLoading } = useMutation({
+  mutationFn: ({ id }) => getTeacherByTeacherIdApi(id),
+  onSuccess: (teachersData) => {
+    classInChargeArr.value = JSON.parse(teachersData[0].class_in_charge);
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const isLoading = computed(() => isTeacherIdLoading.value);
+onMounted(() => {
   currentAvatarUrl.value = user.value.avatar;
   if (!isStudent.value) {
-    const teachers = await getTeacherByTeacherId(user.value.sub);
-    classInChargeArr.value = JSON.parse(teachers[0].class_in_charge);
+    getTeacherByTeacherId({ id: user.value.sub });
   }
-  isLoading.value = false;
 })
 </script>

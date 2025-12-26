@@ -14,8 +14,8 @@
       </thead>
       <tbody>
         <ScoreListItem v-for="scoreItem in filteredScoreListByPage" :key="scoreItem.id" :scoreItem
-          :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)"
-          v-if="students.length > 0" />
+          :currentStudent="scoreList.find((student) => student.student_id === scoreItem.student_id)"
+          v-if="scoreList.length > 0" />
       </tbody>
     </table>
   </div>
@@ -23,10 +23,10 @@
 </template>
 
 <script setup>
-import { getScoreList } from '@/services/apiScore';
+import { getScoreList as getScoreListApi } from '@/services/apiScore';
 import { onMounted, ref, computed, watch } from 'vue';
 import ScoreListItem from './ScoreListItem.vue';
-import { getStudentByStudentId, getStudentList } from '@/services/apiStudent';
+import { getStudentByStudentId as getStudentByStudentIdApi, getStudentList as getStudentListApi } from '@/services/apiStudent';
 import { getUserId } from '@/utils/userHelper';
 import Loading from '@/ui/Loading.vue';
 import { useUserStore } from '@/stores/user';
@@ -36,12 +36,13 @@ import Pagination from '@/ui/Pagination.vue';
 import { useRouter } from 'vue-router';
 import { getConfig } from '@/utils/configHelper';
 import { useRoute } from 'vue-router';
+import { useMutation } from '@tanstack/vue-query';
+import { useToast } from 'vue-toastification';
 
 const userStore = useUserStore();
 const { isStudent } = storeToRefs(userStore);
 const scoreList = ref([]);
 const students = ref([]);
-const isLoading = ref(true);
 const filteredScoreList = computed(() => {
   const userId = getUserId();
   if (isStudent.value) {
@@ -60,18 +61,7 @@ const pageCount = computed(() =>
   Math.ceil(filteredScoreListBySearch.value.length / pageSize.value)//向上取整
 );
 
-watch(
-  () => currentPage.value,
-  () => {
-    router.push({ query: { page: currentPage.value } });
-  }
-);
-watch(
-  () => route.query.page,
-  (newPage) => {
-    currentPage.value = newPage;
-  }
-);
+
 
 //前端分页
 const filteredScoreListByPage = computed(() => {
@@ -104,19 +94,60 @@ const filteredScoreListBySearch = computed(() => {
   });
 });
 
-onMounted(async () => {
-  router.push({ query: { page: currentPage.value } });
-  isLoading.value = true;
-  scoreList.value = await getScoreList();
-
-  const userId = getUserId();
-  if (!isStudent.value) {
-    students.value = await getStudentList(userId);
-  } else {
-    const student = await getStudentByStudentId(userId);
-    students.value = [student];
+const toast = useToast();
+const { mutate: getScoreList, isPending: isScoreListLoading } = useMutation({
+  mutationFn: getScoreListApi,
+  onSuccess: (scoreListData) => {
+    scoreList.value = scoreListData;
+    if (!isStudent.value) {
+      getStudentList();
+    } else {
+      getStudentByStudentId();
+    }
+  },
+  onError: (error) => {
+    toast.error(error.message);
   }
-  isLoading.value = false;
+})
+
+const { mutate: getStudentList, isPending: isStudentListLoading } = useMutation({
+  mutationFn: () => getStudentListApi(getUserId()),
+  onSuccess: (studentListData) => {
+    students.value = studentListData;
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const { mutate: getStudentByStudentId, isPending: isStudentIdLoading } = useMutation({
+  mutationFn: () => getStudentByStudentIdApi(getUserId()),
+  onSuccess: (studentData) => {
+    students.value = [studentData];
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const isLoading = computed(() => isScoreListLoading.value || isStudentListLoading.value || isStudentIdLoading.value);
+
+watch(
+  () => currentPage.value,
+  () => {
+    router.push({ query: { page: currentPage.value } });
+  }
+);
+watch(
+  () => route.query.page,
+  (newPage) => {
+    currentPage.value = newPage;
+  }
+);
+
+onMounted(() => {
+  router.push({ query: { page: currentPage.value } });
+  getScoreList();
 });
 
 

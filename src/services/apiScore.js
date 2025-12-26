@@ -167,7 +167,7 @@ export async function getScoreList() {
 
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
   return score
 }

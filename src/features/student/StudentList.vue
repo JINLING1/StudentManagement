@@ -27,7 +27,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue';
 import StudentListItem from './StudentListItem.vue';
-import { getStudentListWithLimit, getStudentListCount } from '@/services/apiStudent';
+import { getStudentListWithLimit as getStudentListWithLimitApi, getStudentListCount as getStudentListCountApi } from '@/services/apiStudent';
 import { getConfig } from '@/utils/configHelper';
 import Loading from '@/ui/Loading.vue';
 import { useSearchStore } from '@/stores/search';
@@ -35,11 +35,15 @@ import { storeToRefs } from 'pinia';
 import Pagination from '@/ui/Pagination.vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getUserId } from '@/utils/userHelper';
+import { useMutation } from '@tanstack/vue-query';
+import { useToast } from 'vue-toastification';
 
 
+
+const toast = useToast();
 
 const studentList = ref([]);
-const isLoading = ref(true);
+
 
 const searchStore = useSearchStore();
 const { studentSearchCondition } = storeToRefs(searchStore);
@@ -67,6 +71,35 @@ const pageCount = computed(() => {
 });
 const studentCount = ref(0);
 
+
+//后端分页
+function fetchData() {
+  const teacherId = getUserId();
+  getStudentListWithLimit({ teacherId, currentPage: currentPage.value, pageSize: pageSize.value });
+}
+
+const { mutate: getStudentListWithLimit, isPending: isStudentListLoading } = useMutation({
+  mutationFn: ({ teacherId, currentPage, pageSize }) => getStudentListWithLimitApi(teacherId, currentPage, pageSize),
+  onSuccess: (studentListData) => {
+    studentList.value = studentListData;
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const { mutate: getStudentListCount, isPending: isCounting } = useMutation({
+  mutationFn: () => getStudentListCountApi(getUserId()),
+  onSuccess: (studentCountData) => {
+    studentCount.value = studentCountData;
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const isLoading = computed(() => isStudentListLoading.value || isCounting.value);
+
 watch(
   () => currentPage.value,
   () => {
@@ -81,22 +114,10 @@ watch(
   }
 );
 
-//后端分页
-async function fetchData() {
-  isLoading.value = true;
-  const token = getConfig('SUPABASE_TOKEN');
-  const userToken = JSON.parse(localStorage.getItem(token));
-
-  const teacherId = userToken.user.id;
-  studentList.value = await getStudentListWithLimit(teacherId, currentPage.value, pageSize.value);
-  isLoading.value = false;
-}
-
-onMounted(async () => {
-  const userId = getUserId();
+onMounted(() => {
   router.push({ query: { page: currentPage.value } });
   fetchData();
-  studentCount.value = await getStudentListCount(userId);
+  getStudentListCount();
 });
 
 

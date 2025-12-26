@@ -16,20 +16,24 @@
       v-model="confirmPassword" />
     <ErrorMessage name="confirmPassword" class="text-red-500" />
 
-    <button class="btn btn-neutral mt-4">Sign Up</button>
-    <button class="btn btn-ghost mt-4" @click="router.push({ name: 'login' })" type="button">Login</button>
+    <button class="btn btn-neutral mt-4" :disabled="isLoading">Sign Up</button>
+    <button class="btn btn-ghost mt-4" @click="router.push({ name: 'login' })" type="button"
+      :disabled="isLoading">Login</button>
   </Form>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
-import { signup } from '@/services/apiAuth.js';
-import { createTeacher } from '@/services/apiTeacher.js'
+import { signup as signupApi } from '@/services/apiAuth.js';
+import { createTeacher as createTeacherApi } from '@/services/apiTeacher.js'
+import { useToast } from 'vue-toastification';
+import { useMutation } from '@tanstack/vue-query';
 
 const router = useRouter();
+const toast = useToast();
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
@@ -40,11 +44,30 @@ const validationSchema = yup.object({
 
 });
 
-async function onSubmit() {
-  const data = await signup(email.value, password.value);
-  console.log(data);
+const { mutate: createTeacher, isPending: isCreating } = useMutation({
+  mutationFn: createTeacherApi,
+  onSuccess: (userData) => {
+    createTeacher({ teacher_id: userData.user.id });
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
 
-  const teacherId = data.user.id;
-  await createTeacher({ teacher_id: teacherId });
+const { mutate: signup, isPending: isSigning } = useMutation({
+  mutationFn: ({ email, password }) => signupApi(email, password),
+  onSuccess: () => {
+    toast.success('Signup successful');
+    router.push({ name: 'login' });
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const isLoading = computed(() => isSigning.value || isCreating.value);
+
+function onSubmit() {
+  signup({ email: email.value, password: password.value });
 }
 </script>

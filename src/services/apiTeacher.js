@@ -4,7 +4,7 @@ export async function createTeacher(teacher) {
   const { error } = await supabase.from('teacher').insert([teacher])
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
 }
 
@@ -17,7 +17,7 @@ export async function getTeacherByTeacherId(teacherId) {
     .eq('teacher_id', teacherId)
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
   return teacher
 }
