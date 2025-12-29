@@ -14,7 +14,7 @@
       </thead>
       <tbody>
         <ScoreListItem v-for="scoreItem in filteredScoreListByPage" :key="scoreItem.id" :scoreItem
-          :currentStudent="scoreList.find((student) => student.student_id === scoreItem.student_id)"
+          :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)"
           v-if="scoreList.length > 0" />
       </tbody>
     </table>
