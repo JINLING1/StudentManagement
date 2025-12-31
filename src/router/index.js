@@ -10,11 +10,11 @@ const router = createRouter({
     },
     {
       path: '/home',
-      name: 'home',
       component: () => import('@/views/HomeView.vue'),
       children: [
         {
           path: '',
+          name: 'home',
           redirect: '/home/score',
         },
         {
