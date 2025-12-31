@@ -72,25 +72,26 @@ const filteredScoreListByPage = computed(() => {
 
 const searchStore = useSearchStore();
 const { scoreSearchCondition } = storeToRefs(searchStore);
+//搜索过滤
 const filteredScoreListBySearch = computed(() => {
   if (!scoreSearchCondition.value.length) {
     return filteredScoreList.value;
   }
+  const conditions = scoreSearchCondition.value.map((condition) => condition.toLowerCase());
 
   return filteredScoreList.value.filter((scoreItem) => {
-    const scoreInfoJSON = JSON.stringify([
-      scoreItem.subject.toLowerCase(),
+    const fieldsToSearch = [
+      students.value.find((student) => student.student_id === scoreItem.student_id).name,
+      scoreItem.subject,
       scoreItem.semesterYear,
-      scoreItem.semesterSeason.toLowerCase(),
-      scoreItem.score,
-    ]);
-
-    for (const condition of scoreSearchCondition.value) {
-      if (!scoreInfoJSON.includes(condition)) {
-        return false;
-      }
-    }
-    return true;
+      scoreItem.semesterSeason,
+      scoreItem.score
+    ]
+    return conditions.every(condition =>
+      fieldsToSearch.some(field =>
+        String(field).toLowerCase().includes(condition)
+      )
+    );
   });
 });
 

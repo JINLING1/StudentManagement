@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <StudentListItem v-for="student in filteredStudentList" :key="student.id" :student />
+        <StudentListItem v-for="student in filteredStudentListBySearch" :key="student.id" :student />
       </tbody>
     </table>
   </div>
@@ -49,17 +49,26 @@ const searchStore = useSearchStore();
 const { studentSearchCondition } = storeToRefs(searchStore);
 
 //搜索条件过滤学生列表
-const filteredStudentList = computed(() => {
-  return studentList.value.filter((student) => {
-    const studentInfoJSON = JSON.stringify([student.name.toLowerCase(), student.gender, student.class, student.grade]);
-    for (const condition of studentSearchCondition.value) {
-      if (!studentInfoJSON.includes(condition)) {
-        return false;
-      }
-    }
+const filteredStudentListBySearch = computed(() => {
+  if (!studentSearchCondition.value) {
+    return studentList.value;
+  }
 
-    return true;
-  });
+  const conditions = studentSearchCondition.value.map(condition => condition.toLowerCase());
+
+  return studentList.value.filter((student) => {
+    const fieldToSearch = [
+      student.name,
+      student.gender,
+      student.class,
+      student.grade
+    ];
+    return conditions.every(condition =>
+      fieldToSearch.some(field =>
+        String(field).toLowerCase().includes(condition)
+      )
+    );
+  })
 });
 
 const router = useRouter();
