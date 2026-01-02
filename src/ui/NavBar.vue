@@ -21,7 +21,7 @@
     <!-- navigation menu for desktop -->
     <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1" v-if="!isStudent">
-        <li><a @click="router.push({ name: 'score' })" :class="route.name === 'score' ? 'menu-active' : ''">Score</a>
+        <li><a @click="router.push({ name: 'score' })" s :class="route.name === 'score' ? 'menu-active' : ''">Score</a>
         </li>
         <li><a @click="router.push({ name: 'student' })"
             :class="route.name === 'student' ? 'menu-active' : ''">Student</a>
