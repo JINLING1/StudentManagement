@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <StudentListItem v-for="student in filteredStudentListBySearch" :key="student.id" :student />
+        <StudentListItem v-for="student in filteredStudentListByPage" :key="student.id" :student />
       </tbody>
     </table>
   </div>
@@ -81,14 +81,20 @@ const pageCount = computed(() => {
 const studentCount = ref(0);
 
 
-//后端分页
-function fetchData() {
-  const teacherId = getUserId();
-  getStudentListWithLimit({ teacherId, currentPage: currentPage.value, pageSize: pageSize.value });
-}
+//前端分页
+// function fetchData() {
+//   const teacherId = getUserId();
+//   getStudentListWithLimit({ teacherId });
+// }
+
+const filteredStudentListByPage = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value;
+  const endIndex = currentPage.value * pageSize.value;
+  return filteredStudentListBySearch.value.slice(startIndex, endIndex);
+});
 
 const { mutate: getStudentListWithLimit, isPending: isStudentListLoading } = useMutation({
-  mutationFn: ({ teacherId, currentPage, pageSize }) => getStudentListWithLimitApi(teacherId, currentPage, pageSize),
+  mutationFn: ({ teacherId }) => getStudentListWithLimitApi(teacherId),
   onSuccess: (studentListData) => {
     studentList.value = studentListData;
   },
@@ -112,7 +118,6 @@ const isLoading = computed(() => isStudentListLoading.value || isCounting.value)
 watch(
   () => currentPage.value,
   () => {
-    fetchData();
     router.push({ query: { page: currentPage.value } });
   }
 );
@@ -125,7 +130,8 @@ watch(
 
 onMounted(() => {
   router.push({ query: { page: currentPage.value } });
-  fetchData();
+  const teacherId = getUserId();
+  getStudentListWithLimit({ teacherId })
   getStudentListCount();
 });
 

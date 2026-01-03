@@ -25,12 +25,11 @@ export async function getStudentListCount(teacherId) {
   return count
 }
 
-export async function getStudentListWithLimit(teacherId, currentPage, pageSize) {
+export async function getStudentListWithLimit(teacherId) {
   const { data: student, error } = await supabase
     .from('student')
     .select('*')
     .eq('teacher_id', teacherId)
-    .range((currentPage - 1) * pageSize, currentPage * pageSize - 1)
 
   if (error) {
     console.log(error.message)
