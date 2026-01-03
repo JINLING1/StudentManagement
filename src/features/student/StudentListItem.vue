@@ -1,10 +1,5 @@
 <template>
   <tr>
-    <th>
-      <label>
-        <input type="checkbox" class="checkbox" />
-      </label>
-    </th>
     <td>
       <div class="flex items-center gap-3">
         <div class="avatar">

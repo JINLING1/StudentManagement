@@ -1,15 +1,10 @@
 <template>
   <Loading v-show="isLoading" />
 
-  <div class="overflow-x-auto" v-show="!isLoading">
+  <div class="overflow-x-auto " v-show="!isLoading">
     <table class="table table-md">
       <thead>
         <tr>
-          <th>
-            <label>
-              <input type="checkbox" class="checkbox" />
-            </label>
-          </th>
           <th>Name</th>
           <th>Class</th>
           <th></th>
