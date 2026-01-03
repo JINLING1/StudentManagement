@@ -3,7 +3,6 @@
 
   <div class="overflow-x-auto" v-show="!isLoading">
     <table class="table table-md">
-      <!-- head -->
       <thead>
         <tr>
           <th>
@@ -21,29 +20,41 @@
       </tbody>
     </table>
   </div>
+
   <Pagination :currentPage :pageCount />
 </template>
 
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue';
-import StudentListItem from './StudentListItem.vue';
-import { getStudentListWithLimit as getStudentListWithLimitApi, getStudentListCount as getStudentListCountApi } from '@/services/apiStudent';
-import { getConfig } from '@/utils/configHelper';
-import Loading from '@/ui/Loading.vue';
-import { useSearchStore } from '@/stores/search';
 import { storeToRefs } from 'pinia';
-import Pagination from '@/ui/Pagination.vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getUserId } from '@/utils/userHelper';
-import { useMutation } from '@tanstack/vue-query';
 import { useToast } from 'vue-toastification';
+import { useMutation } from '@tanstack/vue-query';
 
-
+import StudentListItem from './StudentListItem.vue';
+import { getStudentList as getStudentListApi } from '@/services/apiStudent.js';
+import { getConfig } from '@/utils/configHelper.js';
+import { getUserId } from '@/utils/userHelper.js';
+import Loading from '@/ui/Loading.vue';
+import Pagination from '@/ui/Pagination.vue';
+import { useSearchStore } from '@/stores/search.js';
 
 const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
 const studentList = ref([]);
+const teacherId = getUserId();
 
+const { mutate: getStudentList, isPending: isStudentListLoading } = useMutation({
+  mutationFn: ({ teacherId }) => getStudentListApi(teacherId),
+  onSuccess: (studentListData) => {
+    studentList.value = studentListData;
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
 
 const searchStore = useSearchStore();
 const { studentSearchCondition } = storeToRefs(searchStore);
@@ -71,21 +82,12 @@ const filteredStudentListBySearch = computed(() => {
   })
 });
 
-const router = useRouter();
-const route = useRoute();
 const currentPage = ref(route.query.page || 1);
 const pageSize = ref(Number(getConfig('PAGE_SIZE')));//每页大小
+
 const pageCount = computed(() => {
-  return Math.ceil(studentCount.value / pageSize.value);
+  return Math.ceil(filteredStudentListBySearch.value.length / pageSize.value);
 });
-const studentCount = ref(0);
-
-
-//前端分页
-// function fetchData() {
-//   const teacherId = getUserId();
-//   getStudentListWithLimit({ teacherId });
-// }
 
 const filteredStudentListByPage = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize.value;
@@ -93,27 +95,7 @@ const filteredStudentListByPage = computed(() => {
   return filteredStudentListBySearch.value.slice(startIndex, endIndex);
 });
 
-const { mutate: getStudentListWithLimit, isPending: isStudentListLoading } = useMutation({
-  mutationFn: ({ teacherId }) => getStudentListWithLimitApi(teacherId),
-  onSuccess: (studentListData) => {
-    studentList.value = studentListData;
-  },
-  onError: (error) => {
-    toast.error(error.message);
-  }
-})
-
-const { mutate: getStudentListCount, isPending: isCounting } = useMutation({
-  mutationFn: () => getStudentListCountApi(getUserId()),
-  onSuccess: (studentCountData) => {
-    studentCount.value = studentCountData;
-  },
-  onError: (error) => {
-    toast.error(error.message);
-  }
-})
-
-const isLoading = computed(() => isStudentListLoading.value || isCounting.value);
+const isLoading = computed(() => isStudentListLoading.value);
 
 watch(
   () => currentPage.value,
@@ -130,10 +112,7 @@ watch(
 
 onMounted(() => {
   router.push({ query: { page: currentPage.value } });
-  const teacherId = getUserId();
-  getStudentListWithLimit({ teacherId })
-  getStudentListCount();
+  getStudentList({ teacherId });
 });
-
 
 </script>
