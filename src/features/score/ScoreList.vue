@@ -55,7 +55,8 @@ const filteredScoreList = computed(() => {
 
 const router = useRouter();
 const route = useRoute();
-const currentPage = ref(route.query.page || 1);
+const PAGE_STORAGE_KEY = 'score_list_page';
+const currentPage = ref(Number(route.query.page) || Number(localStorage.getItem(PAGE_STORAGE_KEY)) || 1);
 const pageSize = ref(Number(getConfig('PAGE_SIZE')));
 const pageCount = computed(() =>
   Math.ceil(filteredScoreListBySearch.value.length / pageSize.value)//向上取整
@@ -133,16 +134,21 @@ const { mutate: getStudentByStudentId, isPending: isStudentIdLoading } = useMuta
 
 const isLoading = computed(() => isScoreListLoading.value || isStudentListLoading.value || isStudentIdLoading.value);
 
+watch(scoreSearchCondition, () => {
+  currentPage.value = 1;
+});
 watch(
   () => currentPage.value,
   () => {
+    localStorage.setItem(PAGE_STORAGE_KEY, currentPage.value);
     router.push({ query: { page: currentPage.value } });
   }
 );
 watch(
   () => route.query.page,
   (newPage) => {
-    currentPage.value = newPage;
+    currentPage.value = Number(newPage);
+    localStorage.setItem(PAGE_STORAGE_KEY, currentPage.value);
   }
 );
 

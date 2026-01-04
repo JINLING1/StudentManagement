@@ -77,7 +77,10 @@ const filteredStudentListBySearch = computed(() => {
   })
 });
 
-const currentPage = ref(route.query.page || 1);
+const PAGE_STORAGE_KEY = 'student_list_page';
+const currentPage = ref(Number(route.query.page) || Number(localStorage.getItem(PAGE_STORAGE_KEY)) || 1);
+
+
 const pageSize = ref(Number(getConfig('PAGE_SIZE')));//每页大小
 
 const pageCount = computed(() => {
@@ -92,16 +95,22 @@ const filteredStudentListByPage = computed(() => {
 
 const isLoading = computed(() => isStudentListLoading.value);
 
+//当搜索后，跳转到第一页
+watch(studentSearchCondition, () => {
+  currentPage.value = 1;
+});
 watch(
   () => currentPage.value,
   () => {
+    localStorage.setItem(PAGE_STORAGE_KEY, currentPage.value);
     router.push({ query: { page: currentPage.value } });
   }
 );
 watch(
   () => route.query.page,
   (newPage) => {
-    currentPage.value = newPage;
+    currentPage.value = Number(newPage);
+    localStorage.setItem(PAGE_STORAGE_KEY, currentPage.value);
   }
 );
 

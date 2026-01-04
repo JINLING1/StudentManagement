@@ -79,7 +79,6 @@ async function onClick() {
   }
 
   const student = await updateStudent(route.params.id, newStudent);
-  console.log(student);
   toast.clear();
   toast.success('Successfully updated!');
   router.push({ name: 'student' });
