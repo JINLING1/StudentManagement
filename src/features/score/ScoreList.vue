@@ -15,7 +15,7 @@
       <tbody>
         <ScoreListItem v-for="scoreItem in filteredScoreListByPage" :key="scoreItem.id" :scoreItem
           :currentStudent="students.find((student) => student.student_id === scoreItem.student_id)"
-          v-if="scoreList.length > 0" />
+          v-if="scoreList.length > 0" @scoreDeleted="getScoreList" />
       </tbody>
     </table>
   </div>
@@ -151,6 +151,12 @@ watch(
     localStorage.setItem(PAGE_STORAGE_KEY, currentPage.value);
   }
 );
+watch(pageCount, (newCount) => {
+  // 如果当前页码大于新的总页数,且总页数大于0，回退到上一页
+  if (currentPage.value > newCount && newCount > 0) {
+    currentPage.value = newCount;
+  }
+});
 
 onMounted(() => {
   router.push({ query: { page: currentPage.value } });

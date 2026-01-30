@@ -181,6 +181,15 @@ export async function createScore(newScore) {
   return data
 }
 
+export async function deleteScore(scoreId) {
+  const { data: score, error } = await supabase.from('score').delete().eq('id', scoreId)
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return score
+}
+
 export async function getScoreByScoreId(scoreId) {
   const { data: score, error } = await supabase.from('score').select('*').eq('id', scoreId)
 
