@@ -22,6 +22,15 @@ export async function addStudent(newStudent) {
   return data
 }
 
+export async function deleteStudent(studentId) {
+  const { data: score, error } = await supabase.from('student').delete().eq('id', studentId)
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return score
+}
+
 export async function getStudentByStudentId(studentId) {
   const { data: student, error } = await supabase
     .from('student')

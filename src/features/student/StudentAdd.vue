@@ -64,6 +64,12 @@ const toast = useToast();
 async function onSubmit() {
   toast.info('Adding...');
   const userData = await signup(email.value, '123456', { isStudent: true });
+  // 检查是否注册成功
+  if (!userData || !userData.user) {
+    toast.clear();
+    toast.error('Sign up failed. Please check console for details.');
+    return; 
+  }
   const studentId = userData.user.id;
   const students = await addStudent({
     name: name.value,

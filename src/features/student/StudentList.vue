@@ -11,7 +11,8 @@
         </tr>
       </thead>
       <tbody>
-        <StudentListItem v-for="student in filteredStudentListByPage" :key="student.id" :student />
+        <StudentListItem v-for="student in filteredStudentListByPage" :key="student.id" :student
+          @studentDeleted="getStudentList({ teacherId })" />
       </tbody>
     </table>
   </div>
@@ -113,6 +114,12 @@ watch(
     localStorage.setItem(PAGE_STORAGE_KEY, currentPage.value);
   }
 );
+watch(pageCount, (newCount) => {
+  // 如果当前页码大于新的总页数,且总页数大于0，回退到上一页
+  if (currentPage.value > newCount && newCount > 0) {
+    currentPage.value = newCount;
+  }
+});
 
 onMounted(() => {
   router.push({ query: { page: currentPage.value } });
