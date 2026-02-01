@@ -1,6 +1,27 @@
-import { supabase } from '../utils/supabase.js'
-export async function signup(email, password, metadata = {}) {
-  const { data, error } = await supabase.auth.signUp({
+import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/utils/supabase.js'
+import { getConfig } from '@/utils/configHelper'
+export async function signup(email, password, metadata = {}, shouldAutoLogin = true) {
+  let authClient
+
+  if (shouldAutoLogin) {
+    //Signup.vue使用全局实例，注册成功后会自动替换LocalStorage，实现自动登录
+    authClient = supabase
+  } else {
+    // StudentAdd.vue 使用 创建临时的，不保存 Session 的客户端
+    const supabaseUrl = getConfig('SUPABASE_URL')
+    const supabaseKey = getConfig('SUPABASE_KEY')
+
+    authClient = createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    })
+  }
+
+  const { data, error } = await authClient.auth.signUp({
     email,
     password,
     options: {
