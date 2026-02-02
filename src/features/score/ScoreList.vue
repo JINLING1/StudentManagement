@@ -1,7 +1,7 @@
 <template>
   <Loading v-show="isLoading" />
 
-  <div class="overflow-x-auto" v-show="!isLoading">
+  <div class="overflow-x-auto" v-if="!isLoading && students.length > 0">
     <table class="table table-md">
       <thead>
         <tr>
@@ -75,12 +75,20 @@ const searchStore = useSearchStore();
 const { scoreSearchCondition } = storeToRefs(searchStore);
 //搜索过滤
 const filteredScoreListBySearch = computed(() => {
+  if (!scoreList.value.length || !students.value.length) {
+    return [];
+  }
+
   if (!scoreSearchCondition.value.length) {
     return filteredScoreList.value;
   }
+
   const conditions = scoreSearchCondition.value.map((condition) => condition.toLowerCase());
 
   return filteredScoreList.value.filter((scoreItem) => {
+    const student = students.value.find((student) => student.student_id === scoreItem.student_id);
+    if (!student) return false;
+
     const fieldsToSearch = [
       students.value.find((student) => student.student_id === scoreItem.student_id).name,
       scoreItem.subject,
@@ -101,9 +109,9 @@ const { mutate: getScoreList, isPending: isScoreListLoading } = useMutation({
   mutationFn: getScoreListApi,
   onSuccess: (scoreListData) => {
     scoreList.value = scoreListData;
-    if (!isStudent.value) {
+    if (!isStudent.value) {//教师，获取管理的所有学生信息
       getStudentList();
-    } else {
+    } else {//学生，仅获取自己的信息
       getStudentByStudentId();
     }
   },
