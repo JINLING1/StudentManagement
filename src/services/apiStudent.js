@@ -23,12 +23,13 @@ export async function addStudent(newStudent) {
 }
 
 export async function deleteStudent(studentId) {
-  const { data: score, error } = await supabase.from('student').delete().eq('id', studentId)
+  const { error } = await supabase.rpc('delete_student_account', {
+    target_user_id: studentId,
+  })
   if (error) {
     console.log(error.message)
-    return
+    throw new Error(error.message)
   }
-  return score
 }
 
 export async function getStudentByStudentId(studentId) {

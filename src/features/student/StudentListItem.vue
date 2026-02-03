@@ -21,7 +21,7 @@
     <th>
       <button class="btn btn-ghost btn-sm"
         @click="router.push({ name: 'student-edit', params: { id: student.student_id } })">details</button>
-      <button class="btn btn-error btn-sm" @click="deleteStudent(student.id)">delete</button>
+      <button class="btn btn-error btn-sm" @click="deleteStudent(student.student_id)">delete</button>
     </th>
   </tr>
 </template>
