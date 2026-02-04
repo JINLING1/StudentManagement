@@ -19,7 +19,7 @@
             <circle cx="12" cy="7" r="4"></circle>
           </g>
         </svg>
-        <input type="text" value="JinLing" class="grow" disabled />
+        <input type="text" :value="userName" class="grow" disabled />
       </label>
       <ul class="menu bg-base-200 rounded-box w-56" v-if="classInChargeArr.length > 0">
         <li>
@@ -47,6 +47,7 @@ import { uploadAvatar } from '@/services/apiStorage';
 import { storeToRefs } from 'pinia';
 import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from '@/stores/user.js';
+import { getStudentByStudentId as getStudentByStudentIdApi } from '@/services/apiStudent';
 import { getTeacherByTeacherId as getTeacherByTeacherIdApi } from '@/services/apiTeacher';
 import { updateUser as updateUserApi } from '@/services/apiAuth.js'
 import Loading from '@/ui/Loading.vue';
@@ -61,6 +62,7 @@ const { updateUser } = userStore;
 const { user, isStudent } = storeToRefs(userStore);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
+const userName = ref('Name');
 
 function handleAvatarChange(event) {
   const file = event.target.files[0];
@@ -114,17 +116,30 @@ const { mutate: getTeacherByTeacherId, isPending: isTeacherIdLoading } = useMuta
   mutationFn: ({ id }) => getTeacherByTeacherIdApi(id),
   onSuccess: (teachersData) => {
     classInChargeArr.value = JSON.parse(teachersData[0].class_in_charge);
+    userName.value = teachersData[0].name;
   },
   onError: (error) => {
     toast.error(error.message);
   }
 })
 
-const isLoading = computed(() => isTeacherIdLoading.value);
+const { mutate: getStudentByStudentId, isPending: isStudentIdLoading } = useMutation({
+  mutationFn: ({ id }) => getStudentByStudentIdApi(id),
+  onSuccess: (studentsData) => {
+    userName.value = studentsData.name;
+  },
+  onError: (error) => {
+    toast.error(error.message);
+  }
+})
+
+const isLoading = computed(() => isTeacherIdLoading.value || isStudentIdLoading.value);
 onMounted(() => {
   currentAvatarUrl.value = user.value.avatar;
   if (!isStudent.value) {
     getTeacherByTeacherId({ id: user.value.sub });
+  } else {
+    getStudentByStudentId({ id: user.value.sub });
   }
 })
 </script>

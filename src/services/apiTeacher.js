@@ -11,7 +11,7 @@ export async function createTeacher(teacher) {
 export async function getTeacherByTeacherId(teacherId) {
   const { data: teacher, error } = await supabase
     .from('teacher')
-    .select('class_in_charge')
+    .select('class_in_charge, name')
 
     // Filters
     .eq('teacher_id', teacherId)
