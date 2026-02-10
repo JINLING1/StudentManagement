@@ -46,8 +46,9 @@ const validationSchema = yup.object({
 
 const { mutate: createTeacher, isPending: isCreating } = useMutation({
   mutationFn: createTeacherApi,
-  onSuccess: (userData) => {
-    createTeacher({ teacher_id: userData.user.id });
+  onSuccess: () => {
+    toast.success('Signup successful');
+    router.push({ name: 'login' });
   },
   onError: (error) => {
     toast.error(error.message);
@@ -56,9 +57,8 @@ const { mutate: createTeacher, isPending: isCreating } = useMutation({
 
 const { mutate: signup, isPending: isSigning } = useMutation({
   mutationFn: ({ email, password }) => signupApi(email, password),
-  onSuccess: () => {
-    toast.success('Signup successful');
-    router.push({ name: 'login' });
+  onSuccess: (userData) => {
+    createTeacher({ teacher_id: userData.user.id });
   },
   onError: (error) => {
     toast.error(error.message);
