@@ -21,3 +21,17 @@ export async function getTeacherByTeacherId(teacherId) {
   }
   return teacher
 }
+
+export async function updateTeacher(teacherId, newTeacher) {
+  const { data, error } = await supabase
+    .from('teacher')
+    .update(newTeacher)
+    .eq('teacher_id', teacherId)
+    .select()
+
+  if (error) {
+    console.log(error.message)
+    return
+  }
+  return data
+}

@@ -19,7 +19,7 @@
             <circle cx="12" cy="7" r="4"></circle>
           </g>
         </svg>
-        <input type="text" :value="userName" class="grow" disabled />
+        <input type="text" v-model="userName" class="grow" />
       </label>
       <ul class="menu bg-base-200 rounded-box w-56" v-if="classInChargeArr.length > 0">
         <li>
@@ -36,7 +36,7 @@
         </li>
       </ul>
     </div>
-    <button class="btn btn-neutral mt-4" @click="onClick">Update Avatar</button>
+    <button class="btn btn-neutral mt-4" @click="onClick">Update Profile</button>
 
 
   </fieldset>
@@ -54,6 +54,7 @@ import Loading from '@/ui/Loading.vue';
 import { useToast } from 'vue-toastification';
 import { getConfig } from '@/utils/configHelper';
 import { updateStudent } from '@/services/apiStudent';
+import { updateTeacher } from '@/services/apiTeacher';
 import { getUserId } from '@/utils/userHelper';
 import { useMutation } from '@tanstack/vue-query';
 
@@ -62,11 +63,10 @@ const { updateUser } = userStore;
 const { user, isStudent } = storeToRefs(userStore);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
-const userName = ref('Name');
+const userName = ref('');
 
 function handleAvatarChange(event) {
   const file = event.target.files[0];
-  console.log(file);
   avatarFile.value = file;
 
   const newAvatarUrl = URL.createObjectURL(file);
@@ -75,37 +75,44 @@ function handleAvatarChange(event) {
 
 const toast = useToast();
 async function onClick() {
-  if (!avatarFile.value) {
-    toast.warning('Please select an avatar!');
-    return;
-  }
   toast.info('Updating...');
   const token = getConfig('SUPABASE_TOKEN')
   const supabaseURL = getConfig('SUPABASE_URL')
+  const userId = getUserId();
 
-  const userToken = JSON.parse(localStorage.getItem(token))
-  const newAvatarFileName = `${userToken.user.email}-${Date.now()}.png`;
+  let newAvatar = user.value.avatar;
 
-  await uploadAvatar(avatarFile.value, newAvatarFileName);
+  if (avatarFile.value) {
+    const userToken = JSON.parse(localStorage.getItem(token))
+    const newAvatarFileName = `${userToken.user.email}-${Date.now()}.png`;
 
-  const newAvatar = `${supabaseURL}/storage/v1/object/public/Avatar/public/${newAvatarFileName}`;
+    await uploadAvatar(avatarFile.value, newAvatarFileName);
 
-  //更新supabase中的信息
-  const updateUserData = await updateUserApi({
-    avatar: newAvatar,
-  })
+    newAvatar = `${supabaseURL}/storage/v1/object/public/Avatar/public/${newAvatarFileName}`;
 
-  //如果是学生，更新学生表中的头像
+    //更新supabase中user的头像 
+    const updateUserData = await updateUserApi({
+      avatar: newAvatar,
+    })
+
+    // 更新store中的avatar
+    updateUser(updateUserData.user.user_metadata);
+  }
+
+
+  //如果是学生，更新学生表中的头像和姓名
   if (isStudent.value) {
-    const userId = getUserId();
     const students = await updateStudent(userId, {
+      name: userName.value,
       avatar: newAvatar,
     });
-    console.log(students);
+  } else {
+    //如果是教师，更新教师表中的姓名
+    const teachers = await updateTeacher(userId, {
+      name: userName.value,
+    });
   }
-  // 更新store中的avatar
-  updateUser(updateUserData.user.user_metadata);
-  console.log('finish')
+
   toast.clear();
   toast.success('Successfully updated!');
 }
