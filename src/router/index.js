@@ -1,4 +1,3 @@
-import { isAuthenticated } from '@/utils/authHelper'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { supabase } from '@/utils/supabase.js'
@@ -89,7 +88,22 @@ const router = createRouter({
   ],
 })
 
+let isFirstRouteCheck = true
+
 router.beforeEach(async (to, from, next) => {
+  if (isFirstRouteCheck) {
+    const isRememberMe = localStorage.getItem('isRememberMe') === 'true'
+    const hasTabSession = sessionStorage.getItem('tabSession')
+
+    //若没有勾选Remember me，且是新开的标签页，则强制清除登录状态
+    if (!isRememberMe && !hasTabSession) {
+      await supabase.auth.signOut()
+    }
+    //打上标签页存活标记，防止 F5 刷新被误判为新标签页
+    sessionStorage.setItem('tabSession', 'active')
+    isFirstRouteCheck = false
+  }
+
   const {
     data: { session },
   } = await supabase.auth.getSession()

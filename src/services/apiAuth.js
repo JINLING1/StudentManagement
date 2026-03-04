@@ -76,3 +76,15 @@ export async function updateUser(newUserMetadata = {}) {
   }
   return data
 }
+
+export async function resetPassword(email) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/update-password`,
+  })
+
+  if (error) {
+    console.log(error.message)
+    throw new Error(error.message)
+  }
+  return data
+}

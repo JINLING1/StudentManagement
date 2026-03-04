@@ -15,10 +15,10 @@
 
     <div class="grid grid-cols-2 gap-1">
       <label class="label">
-        <input type="checkbox" checked="checked" class="checkbox" />
+        <input type="checkbox" checked="checked" class="checkbox" v-model="rememberMe" />
         Remember me
       </label>
-      <button class="btn btn-link text-xs" type="button">Forget Password?</button>
+      <button class="btn btn-link text-xs" type="button" @click="handleForgetPassword">Forget Password?</button>
     </div>
 
     <button class="btn btn-ghost mt-4" @click="router.push({ name: 'signup' })" type="button" :disabled="isLogging">
@@ -41,6 +41,7 @@ const router = useRouter();
 const toast = useToast();
 const email = ref('');
 const password = ref('');
+const rememberMe = ref(true);
 const validationSchema = yup.object({
   email: yup.string().required().email(),
   password: yup.string().required().min(6),
@@ -51,6 +52,8 @@ const { mutate: login, isPending: isLogging } = useMutation({
   mutationFn: ({ email, password }) => loginApi(email, password),//API函数
   onSuccess: () => {
     toast.success('Login successful');
+    localStorage.setItem('isRememberMe', rememberMe.value);
+    sessionStorage.setItem('tabSession', 'active');
     router.push('/');
   },
   onError: (error) => {
@@ -60,5 +63,13 @@ const { mutate: login, isPending: isLogging } = useMutation({
 
 function onSubmit() {
   login({ email: email.value, password: password.value });//useMutation封装后的函数不再为异步函数，接收参数为一个对象
+}
+
+function handleForgetPassword() {
+  if (!email.value) {
+    toast.warning('Please enter your email address first.');
+    return;
+  }
+  toast.info(`Reset link has been sent to ${email.value}`);
 }
 </script>
