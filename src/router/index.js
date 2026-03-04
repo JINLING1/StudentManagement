@@ -1,5 +1,7 @@
 import { isAuthenticated } from '@/utils/authHelper'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import { supabase } from '@/utils/supabase.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,11 +31,13 @@ const router = createRouter({
               path: ':id', //路由参数
               name: 'score-edit',
               component: () => import('@/features/score/ScoreEdit.vue'),
+              meta: { requiresTeacher: true },
             },
             {
               path: 'upload',
               name: 'score-upload',
               component: () => import('@/features/score/ScoreUpload.vue'),
+              meta: { requiresTeacher: true },
             },
           ],
         },
@@ -44,16 +48,19 @@ const router = createRouter({
               path: '',
               name: 'student',
               component: () => import('@/features/student/StudentList.vue'),
+              meta: { requiresTeacher: true },
             },
             {
               path: ':id',
               name: 'student-edit',
               component: () => import('@/features/student/StudentEdit.vue'),
+              meta: { requiresTeacher: true },
             },
             {
               path: 'add',
               name: 'student-add',
               component: () => import('@/features/student/StudentAdd.vue'),
+              meta: { requiresTeacher: true },
             },
           ],
         },
@@ -82,23 +89,31 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to) => {
-  //   if (
-  //     // make sure the user is authenticated
-  //     !isAuthenticated &&
-  //     // ❗️ Avoid an infinite redirect
-  //     to.name !== 'Login'
-  //   ) {
-  //     // redirect the user to the login page
-  //     return { name: 'Login' }
-  //   }
-  const routeName = to.name
-  if (routeName !== 'login' && routeName !== 'signup') {
-    const isLogin = await isAuthenticated()
-    if (!isLogin) {
-      router.push({ name: 'login' })
-      return
+router.beforeEach(async (to, from, next) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session && to.name !== 'login' && to.name !== 'signup') {
+    return next({ name: 'login' })
+  }
+
+  let isStudent = false
+
+  if (session && session.user) {
+    isStudent = session.user.user_metadata?.isStudent === true
+    const userStore = useUserStore()
+    userStore.updateUser(session.user.user_metadata)
+  }
+
+  if (to.meta.requiresTeacher) {
+    if (isStudent) {
+      next({ name: 'home' })
+    } else {
+      next()
     }
+  } else {
+    next()
   }
 })
 

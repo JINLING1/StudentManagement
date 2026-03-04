@@ -58,7 +58,6 @@ const { user } = storeToRefs(userStore);
 const validationSchema = yup.object({
   email: yup.string().required().email(),
 });
-console.log(validationSchema);
 
 const toast = useToast();
 async function onSubmit() {
