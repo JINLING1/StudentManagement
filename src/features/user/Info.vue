@@ -64,6 +64,8 @@ const { user, isStudent } = storeToRefs(userStore);
 const currentAvatarUrl = ref('https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp');
 const avatarFile = ref(null)
 const userName = ref('');
+const userId = ref(null);
+
 
 function handleAvatarChange(event) {
   const file = event.target.files[0];
@@ -78,7 +80,7 @@ async function onClick() {
   toast.info('Updating...');
   const token = getConfig('SUPABASE_TOKEN')
   const supabaseURL = getConfig('SUPABASE_URL')
-  const userId = getUserId();
+  userId.value = await getUserId();
 
   let newAvatar = user.value.avatar;
 
@@ -141,12 +143,13 @@ const { mutate: getStudentByStudentId, isPending: isStudentIdLoading } = useMuta
 })
 
 const isLoading = computed(() => isTeacherIdLoading.value || isStudentIdLoading.value);
-onMounted(() => {
+onMounted(async () => {
   currentAvatarUrl.value = user.value.avatar;
   if (!isStudent.value) {
     getTeacherByTeacherId({ id: user.value.sub });
   } else {
     getStudentByStudentId({ id: user.value.sub });
   }
+  userId.value = await getUserId();
 })
 </script>

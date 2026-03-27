@@ -39,8 +39,8 @@ const toast = useToast();
 const router = useRouter();
 const route = useRoute();
 
-const studentList = ref([]);
-const teacherId = getUserId();
+const studentList = ref([]);;
+const teacherId = ref(null);
 
 const { mutate: getStudentList, isPending: isStudentListLoading } = useMutation({
   mutationFn: ({ teacherId }) => getStudentListApi(teacherId),
@@ -121,9 +121,14 @@ watch(pageCount, (newCount) => {
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
   router.push({ query: { page: currentPage.value } });
-  getStudentList({ teacherId });
+  try {
+    teacherId.value = await getUserId();
+    getStudentList({ teacherId: teacherId.value });
+  } catch (error) {
+    toast.error("User ID not found, please re-login.");
+  }
 });
 
 </script>

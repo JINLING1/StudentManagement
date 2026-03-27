@@ -43,10 +43,10 @@ const userStore = useUserStore();
 const { isStudent } = storeToRefs(userStore);
 const scoreList = ref([]);
 const students = ref([]);
+const currentUserId = ref(null);
 const filteredScoreList = computed(() => {
-  const userId = getUserId();
   if (isStudent.value) {
-    return scoreList.value.filter((scoreItem) => scoreItem.student_id === userId);
+    return scoreList.value.filter((scoreItem) => scoreItem.student_id === currnetUserId);
   } else {
     return scoreList.value.filter((scoreItem) => students.value.map((student) => student.student_id).includes(scoreItem.student_id));
   };
@@ -107,12 +107,15 @@ const filteredScoreListBySearch = computed(() => {
 const toast = useToast();
 const { mutate: getScoreList, isPending: isScoreListLoading } = useMutation({
   mutationFn: getScoreListApi,
-  onSuccess: (scoreListData) => {
+  onSuccess: async (scoreListData) => {
     scoreList.value = scoreListData;
+    if (!currentUserId.value) {
+      currentUserId.value = await getUserId();
+    }
     if (!isStudent.value) {//教师，获取管理的所有学生信息
-      getStudentList();
+      getStudentList(currentUserId.value);
     } else {//学生，仅获取自己的信息
-      getStudentByStudentId();
+      getStudentByStudentId(currentUserId.value);
     }
   },
   onError: (error) => {
@@ -121,7 +124,7 @@ const { mutate: getScoreList, isPending: isScoreListLoading } = useMutation({
 })
 
 const { mutate: getStudentList, isPending: isStudentListLoading } = useMutation({
-  mutationFn: () => getStudentListApi(getUserId()),
+  mutationFn: (userId) => getStudentListApi(userId),
   onSuccess: (studentListData) => {
     students.value = studentListData;
   },
@@ -131,7 +134,7 @@ const { mutate: getStudentList, isPending: isStudentListLoading } = useMutation(
 })
 
 const { mutate: getStudentByStudentId, isPending: isStudentIdLoading } = useMutation({
-  mutationFn: () => getStudentByStudentIdApi(getUserId()),
+  mutationFn: (userId) => getStudentByStudentIdApi(userId),
   onSuccess: (studentData) => {
     students.value = [studentData];
   },
@@ -166,9 +169,14 @@ watch(pageCount, (newCount) => {
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
   router.push({ query: { page: currentPage.value } });
-  getScoreList();
+  try {
+    currentUserId.value = await getUserId();
+    getScoreList();
+  } catch (error) {
+    toast.error("User ID not found, please re-login.");
+  }
 });
 
 

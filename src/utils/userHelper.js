@@ -1,8 +1,14 @@
-import { getConfig } from '../utils/configHelper.js'
+import { getUser } from '@/services/apiAuth'
 
-export function getUserId() {
-  const token = getConfig('SUPABASE_TOKEN')
-
-  const userToken = JSON.parse(localStorage.getItem(token))
-  return userToken.user.id
+export async function getUserId() {
+  try {
+    const user = await getUser()
+    if (!user) {
+      throw new Error('User not found')
+    }
+    return user.id
+  } catch (error) {
+    console.error('Failed to fetch user ID:', error)
+    throw error
+  }
 }
