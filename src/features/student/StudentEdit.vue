@@ -29,14 +29,15 @@
 </template>
 
 <script setup>
-import { getStudentByStudentId } from '@/services/apiStudent';
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { updateStudent } from '@/services/apiStudent';
+import { getStudentByStudentId, updateStudent } from '@/services/apiStudent';
+import { getUser } from '@/services/apiAuth';
 import { uploadAvatar } from '@/services/apiStorage';
 import { getConfig } from '@/utils/configHelper';
-import { useRouter } from 'vue-router';
 import Loading from '@/ui/Loading.vue';
+
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 
 const route = useRoute();
@@ -65,11 +66,14 @@ async function onClick() {
   }
 
   if (avatarFile.value) {
-    const token = getConfig('SUPABASE_TOKEN');
     const supabaseURL = getConfig('SUPABASE_URL');
+    const currentUser = await getUser();
+    if (!currentUser) {
+      toast.error('Authentication error. Please login again.');
+      return;
+    }
+    const newAvatarFileName = `${currentUser.email}-${Date.now()}.png`;
 
-    const userToken = JSON.parse(localStorage.getItem(token));
-    const newAvatarFileName = `${userToken.user.email}-${Date.now()}.png`;
 
     await uploadAvatar(avatarFile.value, newAvatarFileName);
 

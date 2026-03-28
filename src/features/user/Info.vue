@@ -49,7 +49,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from '@/stores/user.js';
 import { getStudentByStudentId as getStudentByStudentIdApi } from '@/services/apiStudent';
 import { getTeacherByTeacherId as getTeacherByTeacherIdApi } from '@/services/apiTeacher';
-import { updateUser as updateUserApi } from '@/services/apiAuth.js'
+import { getUser, updateUser as updateUserApi } from '@/services/apiAuth.js'
 import Loading from '@/ui/Loading.vue';
 import { useToast } from 'vue-toastification';
 import { getConfig } from '@/utils/configHelper';
@@ -78,15 +78,18 @@ function handleAvatarChange(event) {
 const toast = useToast();
 async function onClick() {
   toast.info('Updating...');
-  const token = getConfig('SUPABASE_TOKEN')
   const supabaseURL = getConfig('SUPABASE_URL')
   userId.value = await getUserId();
 
   let newAvatar = user.value.avatar;
 
   if (avatarFile.value) {
-    const userToken = JSON.parse(localStorage.getItem(token))
-    const newAvatarFileName = `${userToken.user.email}-${Date.now()}.png`;
+    const currentUser = await getUser();
+    if (!currentUser) {
+      toast.error('Authentication error. Please login again.');
+      return;
+    }
+    const newAvatarFileName = `${currentUser.email}-${Date.now()}.png`;
 
     await uploadAvatar(avatarFile.value, newAvatarFileName);
 
@@ -104,13 +107,13 @@ async function onClick() {
 
   //如果是学生，更新学生表中的头像和姓名
   if (isStudent.value) {
-    const students = await updateStudent(userId, {
+    const students = await updateStudent(userId.value, {
       name: userName.value,
       avatar: newAvatar,
     });
   } else {
     //如果是教师，更新教师表中的姓名
-    const teachers = await updateTeacher(userId, {
+    const teachers = await updateTeacher(userId.value, {
       name: userName.value,
     });
   }

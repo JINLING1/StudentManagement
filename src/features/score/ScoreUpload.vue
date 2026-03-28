@@ -48,11 +48,12 @@
 <script setup>
 import { createScore } from '@/services/apiScore';
 import { getStudentList } from '@/services/apiStudent';
-import { getConfig } from '@/utils/configHelper';
+import { getUserId } from '@/utils/userHelper';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Loading from '@/ui/Loading.vue';
 import { useToast } from 'vue-toastification';
+
 
 const currentStudent = ref({
   name: 'someone',
@@ -90,10 +91,8 @@ async function onClick() {
 const isLoading = ref(true);
 onMounted(async () => {
   isLoading.value = true;
-  const token = getConfig('SUPABASE_TOKEN');
-  const userToken = JSON.parse(localStorage.getItem(token));
 
-  const teacherId = userToken.user.id;
+  const teacherId = await getUserId();
   students.value = await getStudentList(teacherId);
 
   currentStudent.value = students.value[0];

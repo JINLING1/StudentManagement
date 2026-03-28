@@ -56,7 +56,7 @@ import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
-import { signout } from '@/services/apiAuth.js';
+import { getUser, signout } from '@/services/apiAuth.js';
 import { useUserStore } from '@/stores/user';
 import { getConfig } from '@/utils/configHelper';
 
@@ -75,11 +75,10 @@ async function onClick() {
   router.push({ name: 'login' });
 }
 
-// 所有界面（除了登录页）都有此组件，因此在 NavBar mounted 时更新用户头像
-onMounted(() => {
-  const token = getConfig('SUPABASE_TOKEN');
-  const userToken = JSON.parse(localStorage.getItem(token));
-  const userMetadata = userToken?.user?.user_metadata;
+//在 NavBar mounted 时更新用户头像
+onMounted(async () => {
+  const user = await getUser();
+  const userMetadata = user?.user_metadata;
   updateUser(userMetadata);
 })
 </script>
